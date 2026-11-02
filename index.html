@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AZIC — AI Chat Workspace Components</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   AZIC GLOBAL DESIGN SYSTEM TOKENS
+   Source: AZ-Global-design-system (Figma)
+═══════════════════════════════════════════════════════════ */
+:root {
+  /* Brand */
+  --brand-dg-100: #16303d;
+  --brand-dg-40:  #8a979e;
+  --brand-dg-15:  #dce0e2;
+  --brand-dg-5:   #f3f5f5;
+  --brand-green:  #2ed88e;
+  --brand-lg-100: #55ffbe;
+  --brand-lg-50:  #aaffdf;
+  --brand-lg-25:  #d4ffef;
+  --brand-border: #b9c1c5;
+  --brand-white:  #ffffff;
+
+  /* Accent */
+  --accent-red:    #f24456;
+  --accent-orange: #f18710;
+  --accent-yellow: #ffcc3d;
+  --accent-green:  #13ce66;
+
+  /* Secondary */
+  --secondary-lime:   #daf561;
+  --secondary-blue:   #a0c7fe;
+  --secondary-purple: #d6b4fc;
+  --secondary-grey:   #76777a;
+
+  /* Text */
+  --text-primary:   #000000;
+  --text-secondary: rgba(0,0,0,.70);
+  --text-disabled:  #e8eaec;
+
+  /* Semantic aliases (used throughout components) */
+  --surface-dark:   var(--brand-dg-100);
+  --surface-bg:     var(--brand-dg-5);
+  --surface-card:   var(--brand-white);
+  --border-default: var(--brand-border);
+
+  /* AI-specific */
+  --ai-primary:   var(--brand-green);
+  --ai-light:     var(--brand-lg-25);
+  --ai-mid:       var(--brand-lg-100);
+  --ai-border:    var(--brand-green);
+
+  /* Radius */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 10px; --r-pill: 20px; --r-full: 50%;
+
+  /* Shadow */
+  --shadow-card:     0 1px 2px rgba(22,48,61,.06), 0 1px 4px rgba(22,48,61,.08);
+  --shadow-float:    0 4px 16px rgba(22,48,61,.12), 0 8px 32px rgba(22,48,61,.10);
+  --shadow-panel:    -4px 0 24px rgba(22,48,61,.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Poppins',sans-serif; background:var(--surface-bg); color:var(--text-primary); font-size:13px; }
+
+/* ─── PROTO NAV ─────────────────────────────────────── */
+.proto-nav {
+  position:fixed; top:0; left:0; right:0; z-index:9999;
+  background:#0d1e26; display:flex; align-items:center; gap:8px;
+  padding:6px 20px; font-size:11px; color:#7a9aab;
+}
+.proto-nav strong { color:var(--brand-green); font-weight:600; margin-right:4px; }
+.proto-tag { background:#1a2e38; border:1px solid #243e4c; color:#a0bcc8;
+  padding:3px 10px; border-radius:4px; font-size:11px; font-family:'Poppins',sans-serif; cursor:pointer; }
+.proto-tag.active, .proto-tag:hover { background:var(--brand-green); color:#000; border-color:var(--brand-green); }
+.proto-sep { color:#243e4c; margin:0 4px; }
+
+/* ─── LAYOUT ─────────────────────────────────────── */
+.layout { display:flex; margin-top:34px; min-height:calc(100vh - 34px); }
+
+/* ─── LEFT NAV ───────────────────────────────────── */
+.left-nav {
+  width:220px; background:var(--surface-dark); position:fixed; top:34px; bottom:0;
+  overflow-y:auto; padding:16px 0; flex-shrink:0;
+}
+.left-nav-title { color:var(--brand-green); font-size:10px; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; padding:0 16px 8px; }
+.nav-item { display:block; padding:8px 16px; font-size:12px; color:#a0bcc8; cursor:pointer;
+  border-left:3px solid transparent; transition:all .15s; text-decoration:none; }
+.nav-item:hover { background:rgba(46,216,142,.06); color:var(--brand-green); }
+.nav-item.active { background:rgba(46,216,142,.10); color:var(--brand-green); border-left-color:var(--brand-green); }
+.nav-section { padding:12px 16px 4px; font-size:10px; color:#4a6370; font-weight:600; text-transform:uppercase; letter-spacing:.8px; margin-top:8px; }
+
+/* ─── MAIN CANVAS ────────────────────────────────── */
+.canvas { margin-left:220px; padding:32px; }
+.section-header { margin-bottom:8px; }
+.section-title { font-size:22px; font-weight:700; color:var(--surface-dark); }
+.section-sub { font-size:13px; color:var(--secondary-grey); margin-top:4px; }
+.component-group { margin-bottom:48px; }
+.component-group-label {
+  font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--brand-dg-40); border-bottom:1px solid var(--border-default);
+  padding-bottom:8px; margin-bottom:20px;
+}
+.component-row { display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; }
+.component-frame {
+  background:var(--surface-card); border:1px solid var(--border-default);
+  border-radius:var(--r-lg); padding:0; overflow:hidden; box-shadow:var(--shadow-card);
+  position:relative;
+}
+.frame-label {
+  font-size:10px; font-weight:600; letter-spacing:.6px; text-transform:uppercase;
+  color:var(--secondary-grey); padding:8px 12px 0;
+}
+.frame-content { padding:16px; }
+.spec-pill {
+  display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px;
+  background:var(--brand-dg-5); border:1px solid var(--border-default);
+  color:var(--secondary-grey); padding:2px 8px; border-radius:var(--r-xs); margin:2px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: CHAT PANEL
+═══════════════════════════════════════════════════════ */
+.chat-panel {
+  width:360px; background:var(--surface-card); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-panel); display:flex; flex-direction:column;
+  border:1px solid var(--border-default); overflow:hidden;
+}
+.chat-panel.narrow { width:320px; }
+
+/* Panel header */
+.chat-header {
+  background:var(--surface-dark); padding:0 16px; height:52px;
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.chat-header-icon {
+  width:28px; height:28px; border-radius:var(--r-full);
+  background:var(--brand-green); display:flex; align-items:center;
+  justify-content:center; flex-shrink:0;
+}
+.chat-header-icon svg { width:14px; height:14px; }
+.chat-header-title { font-size:13px; font-weight:600; color:#fff; flex:1; }
+.chat-header-badge { font-size:10px; background:rgba(46,216,142,.15); color:var(--brand-green);
+  border:1px solid rgba(46,216,142,.3); border-radius:var(--r-pill);
+  padding:1px 8px; font-weight:600; letter-spacing:.3px; }
+.chat-header-btn { width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  color:#7a9aab; cursor:pointer; border-radius:var(--r-xs); transition:background .15s; }
+.chat-header-btn:hover { background:rgba(255,255,255,.08); color:#fff; }
+
+/* Processing bar */
+.chat-processing-bar {
+  height:2px; background:var(--brand-dg-15);
+  overflow:hidden; flex-shrink:0;
+}
+.chat-processing-bar .bar-fill {
+  height:100%; width:60%; background:linear-gradient(90deg,var(--brand-green),var(--brand-lg-100));
+  animation:barSlide 1.6s ease-in-out infinite;
+}
+@keyframes barSlide {
+  0% { transform:translateX(-100%); }
+  100% { transform:translateX(250%); }
+}
+
+/* Context banner */
+.chat-context-banner {
+  background:var(--brand-lg-25); border-bottom:1px solid rgba(46,216,142,.2);
+  padding:8px 14px; font-size:11px; color:var(--surface-dark); display:flex; align-items:center; gap:6px;
+}
+.chat-context-banner svg { width:12px; height:12px; color:var(--brand-green); flex-shrink:0; }
+
+/* Message thread */
+.chat-thread {
+  flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;
+  min-height:200px; max-height:420px;
+}
+.chat-thread::-webkit-scrollbar { width:4px; }
+.chat-thread::-webkit-scrollbar-thumb { background:var(--brand-dg-15); border-radius:4px; }
+
+/* Timestamp divider */
+.time-divider { text-align:center; font-size:10px; color:var(--brand-dg-40); margin:4px 0; }
+
+/* ─ Message bubbles ─ */
+.msg { display:flex; gap:8px; max-width:88%; animation:msgIn .25s ease-out; }
+.msg.ai { align-self:flex-start; }
+.msg.user { align-self:flex-end; flex-direction:row-reverse; }
+@keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+.msg-avatar {
+  width:28px; height:28px; border-radius:var(--r-full);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:11px; font-weight:700; margin-top:2px;
+}
+.msg-avatar.ai { background:var(--brand-green); }
+.msg-avatar.user { background:var(--accent-orange); color:#fff; }
+
+.bubble {
+  padding:10px 13px; border-radius:0 10px 10px 10px;
+  font-size:12.5px; line-height:1.5; max-width:100%;
+}
+.bubble.ai {
+  background:var(--surface-card); color:var(--text-primary);
+  border:1px solid var(--border-default);
+  border-left:2px solid var(--brand-green);
+  box-shadow:var(--shadow-card);
+}
+.bubble.user {
+  background:var(--surface-dark); color:#fff;
+  border-radius:10px 0 10px 10px;
+}
+
+.bubble-meta { font-size:10px; color:var(--brand-dg-40); margin-top:4px; display:flex; gap:8px; align-items:center; }
+.bubble-actions { display:none; gap:4px; margin-top:6px; }
+.msg:hover .bubble-actions { display:flex; }
+.bubble-action-btn {
+  font-size:10px; color:var(--secondary-grey); background:var(--brand-dg-5);
+  border:1px solid var(--border-default); border-radius:var(--r-xs);
+  padding:2px 7px; cursor:pointer; display:flex; align-items:center; gap:3px;
+  transition:all .15s;
+}
+.bubble-action-btn:hover { background:var(--brand-lg-25); color:var(--surface-dark); border-color:var(--brand-green); }
+.bubble-action-btn.neg:hover { background:#fef2f2; color:var(--accent-red); border-color:var(--accent-red); }
+
+/* ─ Typing indicator ─ */
+.typing-indicator { display:flex; align-items:center; gap:4px; padding:10px 13px;
+  background:var(--surface-card); border:1px solid var(--border-default);
+  border-left:2px solid var(--brand-green); border-radius:0 10px 10px 10px;
+  width:fit-content;
+}
+.typing-dot { width:5px; height:5px; border-radius:var(--r-full); background:var(--brand-green);
+  animation:typeDot 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
+@keyframes typeDot { 0%,80%,100% { opacity:.2; transform:scale(.8); } 40% { opacity:1; transform:scale(1); } }
+
+/* ─ Streaming state ─ */
+.streaming-cursor { display:inline-block; width:2px; height:13px;
+  background:var(--brand-green); margin-left:2px; vertical-align:middle;
+  animation:blink .9s step-end infinite; }
+@keyframes blink { 50% { opacity:0; } }
+
+/* ─ Quick reply chips ─ */
+.quick-replies { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.quick-chip {
+  font-size:11.5px; font-weight:500; color:var(--surface-dark);
+  background:var(--brand-lg-25); border:1px solid rgba(46,216,142,.3);
+  border-radius:var(--r-pill); padding:4px 12px; cursor:pointer;
+  transition:all .15s; white-space:nowrap;
+}
+.quick-chip:hover { background:var(--brand-green); color:#000; border-color:var(--brand-green); }
+.quick-chip.selected { background:var(--brand-green); color:#000; border-color:var(--brand-green); opacity:.6; cursor:default; }
+
+/* ─ Input bar ─ */
+.chat-input-bar {
+  padding:10px 12px; border-top:1px solid var(--border-default); background:var(--surface-card);
+  display:flex; gap:8px; align-items:flex-end; flex-shrink:0;
+}
+.chat-input-wrap { flex:1; background:var(--brand-dg-5); border:1.5px solid var(--border-default);
+  border-radius:var(--r-md); padding:8px 10px; display:flex; align-items:center; gap:8px;
+  transition:border-color .15s; }
+.chat-input-wrap:focus-within { border-color:var(--brand-green); background:#fff; }
+.chat-input-wrap textarea {
+  border:none; outline:none; background:transparent; resize:none;
+  font-family:'Poppins',sans-serif; font-size:12.5px; color:var(--text-primary);
+  flex:1; min-height:20px; max-height:72px; line-height:1.4; overflow-y:auto;
+}
+.chat-input-wrap textarea::placeholder { color:var(--brand-dg-40); }
+.chat-input-icon { color:var(--brand-dg-40); cursor:pointer; flex-shrink:0; transition:color .15s; }
+.chat-input-icon:hover { color:var(--brand-green); }
+.chat-send-btn {
+  width:36px; height:36px; border-radius:var(--r-md); border:none; cursor:pointer;
+  background:var(--brand-green); display:flex; align-items:center; justify-content:center;
+  transition:all .15s; flex-shrink:0;
+}
+.chat-send-btn:hover { background:var(--brand-lg-100); transform:scale(1.05); }
+.chat-send-btn.disabled { background:var(--brand-dg-15); cursor:not-allowed; transform:none; }
+.chat-send-btn svg { width:16px; height:16px; }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: AI ACTION CARDS
+═══════════════════════════════════════════════════════ */
+.action-card {
+  background:var(--surface-card); border:1px solid var(--border-default);
+  border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-card);
+  width:100%; transition:box-shadow .15s;
+}
+.action-card:hover { box-shadow:var(--shadow-float); }
+.action-card.conf-high  { border-left:3px solid var(--brand-green); }
+.action-card.conf-med   { border-left:3px solid var(--accent-orange); }
+.action-card.conf-low   { border-left:3px solid var(--accent-red); }
+.action-card.accepted   { border-left:3px solid var(--accent-green); background:#f0fdf8; }
+.action-card.compliance { border-left:3px solid var(--accent-yellow); background:#fffbeb; }
+.action-card.draft      { border-left:3px solid var(--secondary-blue); background:#f0f7ff; }
+.action-card.calc       { border-left:3px solid var(--secondary-purple); background:#faf5ff; }
+
+.action-card-header {
+  display:flex; align-items:center; gap:8px; padding:10px 14px 8px;
+}
+.action-card-icon {
+  width:24px; height:24px; border-radius:var(--r-xs);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.action-card-icon.green  { background:var(--brand-lg-25); }
+.action-card-icon.orange { background:#fff4e5; }
+.action-card-icon.red    { background:#fef2f2; }
+.action-card-icon.yellow { background:#fffbeb; }
+.action-card-icon.blue   { background:#eff6ff; }
+.action-card-icon.purple { background:#faf5ff; }
+
+.action-card-title { font-size:12.5px; font-weight:600; color:var(--surface-dark); flex:1; }
+
+/* Confidence badge */
+.conf-badge {
+  font-size:10px; font-weight:700; border-radius:var(--r-pill);
+  padding:2px 8px; letter-spacing:.3px; flex-shrink:0;
+}
+.conf-badge.high { background:var(--brand-green); color:#000; }
+.conf-badge.med  { background:var(--accent-orange); color:#fff; }
+.conf-badge.low  { background:var(--accent-red); color:#fff; }
+.conf-badge.na   { background:var(--brand-dg-15); color:var(--secondary-grey); }
+
+.action-card-body { padding:0 14px 10px; }
+.action-field { margin-bottom:8px; }
+.action-field-label { font-size:10.5px; font-weight:500; color:var(--secondary-grey); text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px; }
+.action-field-value { font-size:13.5px; font-weight:600; color:var(--surface-dark); }
+.action-field-value.placeholder { color:var(--brand-dg-40); font-style:italic; font-weight:400; }
+
+.action-source { font-size:10.5px; color:var(--brand-dg-40); font-style:italic; padding:4px 14px 8px; display:flex; align-items:center; gap:4px; }
+.action-source svg { width:11px; height:11px; flex-shrink:0; }
+
+.action-card-buttons { display:flex; gap:6px; padding:8px 14px 12px; border-top:1px solid var(--brand-dg-5); }
+.ac-btn {
+  font-family:'Poppins',sans-serif; font-size:11.5px; font-weight:600;
+  border-radius:var(--r-sm); padding:5px 14px; cursor:pointer; transition:all .15s; border:none;
+}
+.ac-btn.accept { background:var(--brand-green); color:#000; }
+.ac-btn.accept:hover { background:var(--brand-lg-100); }
+.ac-btn.edit { background:transparent; border:1.5px solid var(--surface-dark); color:var(--surface-dark); }
+.ac-btn.edit:hover { background:var(--surface-dark); color:#fff; }
+.ac-btn.dismiss { background:transparent; color:var(--accent-red); padding:5px 8px; }
+.ac-btn.dismiss:hover { text-decoration:underline; }
+.ac-btn.accept.disabled { background:var(--brand-dg-15); color:var(--secondary-grey); cursor:not-allowed; }
+.ac-btn.review-required { background:#fef2f2; border:1px solid var(--accent-red); color:var(--accent-red); cursor:not-allowed; font-size:11px; }
+.ac-btn.accepted-state { background:#f0fdf8; border:1px solid var(--accent-green); color:var(--accent-green); cursor:default; font-size:11px; }
+
+/* Multi-field table in action card */
+.ac-table { width:100%; border-collapse:collapse; font-size:12px; }
+.ac-table td { padding:4px 0; border-bottom:1px solid var(--brand-dg-5); }
+.ac-table td:first-child { color:var(--secondary-grey); width:45%; }
+.ac-table td:last-child { font-weight:600; color:var(--surface-dark); text-align:right; }
+.ac-table tr:last-child td { border-bottom:none; }
+
+/* Review required banner */
+.review-banner {
+  margin:0 14px 10px; padding:7px 10px; background:#fef2f2;
+  border:1px solid rgba(242,68,86,.2); border-radius:var(--r-xs);
+  font-size:11px; color:var(--accent-red); display:flex; align-items:center; gap:6px;
+}
+.review-banner svg { width:13px; height:13px; flex-shrink:0; }
+
+/* Draft card content */
+.draft-content {
+  font-size:12px; color:var(--text-secondary); line-height:1.6;
+  background:var(--brand-dg-5); border-radius:var(--r-xs);
+  padding:10px 12px; margin:0 14px 10px; font-style:italic; border-left:2px solid var(--secondary-blue);
+}
+
+/* Calc table */
+.calc-breakdown { margin:0 14px 10px; }
+.calc-row { display:flex; justify-content:space-between; padding:4px 0; font-size:12px; border-bottom:1px solid var(--brand-dg-5); }
+.calc-row:last-child { border-bottom:none; font-weight:700; color:var(--surface-dark); font-size:13px; }
+.calc-label { color:var(--secondary-grey); }
+.calc-value { font-weight:600; font-size:12px; }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: HANDOFF / STATUS BANNERS
+═══════════════════════════════════════════════════════ */
+.handoff-banner {
+  border-radius:var(--r-sm); padding:10px 14px; font-size:12px; margin:8px 0;
+  display:flex; align-items:center; gap:8px;
+}
+.handoff-banner.escalating { background:#fffbeb; border:1px solid rgba(241,135,16,.25); color:#92400e; }
+.handoff-banner.waiting    { background:#fff7ed; border:1px solid rgba(241,135,16,.3); color:#92400e; }
+.handoff-banner.joined     { background:var(--brand-lg-25); border:1px solid rgba(46,216,142,.3); color:var(--surface-dark); }
+.handoff-banner svg        { width:14px; height:14px; flex-shrink:0; }
+.handoff-dot { width:8px; height:8px; border-radius:var(--r-full); flex-shrink:0; }
+.handoff-dot.pulse { animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(241,135,16,.4);} 50%{box-shadow:0 0 0 6px rgba(241,135,16,0);} }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: INPUT BAR VARIANTS
+═══════════════════════════════════════════════════════ */
+.file-chip {
+  display:flex; align-items:center; gap:6px; background:var(--brand-lg-25);
+  border:1px solid rgba(46,216,142,.3); border-radius:var(--r-sm);
+  padding:5px 10px; font-size:11.5px; font-weight:500; color:var(--surface-dark);
+}
+.file-chip svg { width:13px; height:13px; color:var(--brand-green); }
+.file-chip .remove { color:var(--brand-dg-40); cursor:pointer; margin-left:4px; font-size:12px; line-height:1; }
+.file-chip .remove:hover { color:var(--accent-red); }
+
+/* Upload progress chip */
+.upload-chip {
+  display:flex; align-items:center; gap:8px; background:var(--brand-dg-5);
+  border:1px solid var(--border-default); border-radius:var(--r-sm);
+  padding:6px 10px; font-size:11.5px; color:var(--secondary-grey); width:100%;
+}
+.upload-progress-bar { flex:1; height:3px; background:var(--brand-dg-15); border-radius:2px; overflow:hidden; }
+.upload-progress-fill { height:100%; background:var(--brand-green); width:65%;
+  animation:uploadProg 1.2s ease-in-out infinite alternate; }
+@keyframes uploadProg { from{width:30%;} to{width:85%;} }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: SHIMMER / LOADING STATE
+═══════════════════════════════════════════════════════ */
+.shimmer-line { height:12px; border-radius:var(--r-xs); margin-bottom:8px;
+  background:linear-gradient(90deg,var(--brand-lg-25) 25%,var(--brand-lg-50) 50%,var(--brand-lg-25) 75%);
+  background-size:200% 100%; animation:shimmer 1.4s infinite; }
+@keyframes shimmer { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+.shimmer-line.w-full { width:100%; }
+.shimmer-line.w-3q   { width:75%; }
+.shimmer-line.w-half { width:50%; }
+.shimmer-label { font-size:11px; color:var(--brand-green); font-style:italic; margin-bottom:8px;
+  display:flex; align-items:center; gap:5px; }
+.shimmer-label svg { width:12px; height:12px; animation:spin 1.5s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: ROLE SELECTOR IN HEADER
+═══════════════════════════════════════════════════════ */
+.role-pills { display:flex; background:rgba(255,255,255,.08); border-radius:var(--r-sm); padding:2px; gap:1px; }
+.role-pill { font-size:10.5px; font-weight:600; color:#7a9aab; padding:3px 9px; border-radius:4px; cursor:pointer; transition:all .15s; }
+.role-pill.active { background:var(--brand-green); color:#000; }
+.role-pill:hover:not(.active) { color:#fff; }
+
+/* ═══════════════════════════════════════════════════════
+   COMPONENT: CONTEXT SUMMARY CARD
+═══════════════════════════════════════════════════════ */
+.summary-card {
+  background:var(--brand-dg-5); border:1px solid var(--border-default);
+  border-radius:var(--r-md); padding:12px 14px; font-size:12px; color:var(--surface-dark);
+}
+.summary-card-title { font-weight:700; font-size:12.5px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.summary-item { display:flex; gap:8px; margin-bottom:5px; font-size:12px; }
+.summary-item-label { color:var(--secondary-grey); width:110px; flex-shrink:0; }
+.summary-item-value { font-weight:500; color:var(--surface-dark); }
+.summary-item-value.masked { color:var(--brand-dg-40); font-style:italic; font-size:11px; }
+
+/* ═══════════════════════════════════════════════════════
+   TOKEN TABLE
+═══════════════════════════════════════════════════════ */
+.token-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+.token-swatch {
+  border:1px solid var(--border-default); border-radius:var(--r-md); overflow:hidden;
+  box-shadow:var(--shadow-card);
+}
+.swatch-color { height:60px; }
+.swatch-info { padding:8px 10px; background:var(--surface-card); }
+.swatch-name { font-size:11px; font-weight:600; color:var(--surface-dark); }
+.swatch-hex  { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--secondary-grey); }
+.swatch-token{ font-size:9.5px; color:var(--brand-dg-40); margin-top:2px; }
+
+/* ═══════════════════════════════════════════════════════
+   MISC UTILITY
+═══════════════════════════════════════════════════════ */
+.full-chat { max-width:360px; }
+.label-tag {
+  display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600;
+  padding:2px 8px; border-radius:var(--r-pill); text-transform:uppercase; letter-spacing:.5px;
+}
+.label-tag.ai     { background:var(--brand-lg-25); color:var(--surface-dark); border:1px solid rgba(46,216,142,.3); }
+.label-tag.user   { background:#fff3e5; color:#7c3000; border:1px solid rgba(241,135,16,.3); }
+.label-tag.system { background:var(--brand-dg-5); color:var(--secondary-grey); border:1px solid var(--border-default); }
+
+/* Scrollspy highlight */
+.component-group:target .component-group-label { color:var(--brand-green); }
+</style>
+</head>
+<body>
+
+<!-- ══ PROTO NAV ══════════════════════════════════════════ -->
+<nav class="proto-nav">
+  <strong>AZIC</strong>
+  <span style="color:#4a6370">·</span>
+  AI Chat Workspace — Component Library
+  <span class="proto-sep">|</span>
+  <span class="proto-tag active">Components</span>
+  <span style="margin-left:auto;color:#4a6370">AZ Global Design System · v1.1</span>
+</nav>
+
+<!-- ══ LEFT NAV ═══════════════════════════════════════════ -->
+<nav class="left-nav">
+  <div class="left-nav-title">Chat Components</div>
+  <div class="nav-section">Foundation</div>
+  <a class="nav-item active" href="#tokens">Design Tokens</a>
+  <div class="nav-section">Panel</div>
+  <a class="nav-item" href="#panel-anatomy">Panel Anatomy</a>
+  <a class="nav-item" href="#panel-states">Panel States</a>
+  <a class="nav-item" href="#panel-roles">Role Variants</a>
+  <div class="nav-section">Messages</div>
+  <a class="nav-item" href="#msg-ai">AI Message</a>
+  <a class="nav-item" href="#msg-user">User Message</a>
+  <a class="nav-item" href="#msg-typing">Typing Indicator</a>
+  <a class="nav-item" href="#msg-stream">Streaming State</a>
+  <a class="nav-item" href="#msg-shimmer">Document Shimmer</a>
+  <div class="nav-section">Action Cards</div>
+  <a class="nav-item" href="#card-prefill">Field Prefill</a>
+  <a class="nav-item" href="#card-risk">Risk Flag</a>
+  <a class="nav-item" href="#card-rec">Recommendation</a>
+  <a class="nav-item" href="#card-doc">Document Summary</a>
+  <a class="nav-item" href="#card-compliance">Compliance Alert</a>
+  <a class="nav-item" href="#card-draft">Draft Generation</a>
+  <a class="nav-item" href="#card-calc">Calculation</a>
+  <a class="nav-item" href="#card-accepted">Accepted State</a>
+  <div class="nav-section">Input</div>
+  <a class="nav-item" href="#input-bar">Input Bar Variants</a>
+  <a class="nav-item" href="#quick-replies">Quick Reply Chips</a>
+  <div class="nav-section">System</div>
+  <a class="nav-item" href="#handoff">Handoff States</a>
+  <a class="nav-item" href="#summary">Context Summary</a>
+  <a class="nav-item" href="#full-convo">Full Conversation</a>
+  <div class="nav-section">Mockups</div>
+  <a class="nav-item" href="#mock-ai-workspace">AI Workspace</a>
+  <a class="nav-item" href="#mock-motor">Motor Insurance</a>
+  <a class="nav-item" href="#mock-marine">Marine Cargo</a>
+  <a class="nav-item" href="#mock-claims">Claims FNOL</a>
+  <a class="nav-item" href="#mock-renewal">Policy Renewal</a>
+  <a class="nav-item" href="#mock-customer">Customer Portal</a>
+</nav>
+
+<!-- ══ CANVAS ═════════════════════════════════════════════ -->
+<main class="canvas">
+
+  <div class="section-header" style="margin-bottom:32px;">
+    <div class="section-title">AI Chat Workspace</div>
+    <div class="section-sub">Component reference · Built from AZ Global Design System · All states & variants</div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <span class="spec-pill">Poppins (300–700)</span>
+      <span class="spec-pill">Base: 13px / 1.5</span>
+      <span class="spec-pill">Spacing: 4px grid</span>
+      <span class="spec-pill">Panel width: 360px</span>
+    </div>
+  </div>
+
+  <!-- ══════════ DESIGN TOKENS ════════════ -->
+  <div class="component-group" id="tokens">
+    <div class="component-group-label">Design Tokens — AZ Global Design System</div>
+    <div class="token-grid">
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#16303d;"></div>
+        <div class="swatch-info"><div class="swatch-name">Brand Dark</div><div class="swatch-hex">#16303d</div><div class="swatch-token">--brand-dg-100</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#2ed88e;"></div>
+        <div class="swatch-info"><div class="swatch-name">Brand Green</div><div class="swatch-hex">#2ed88e</div><div class="swatch-token">--brand-green / AI primary</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#55ffbe;"></div>
+        <div class="swatch-info"><div class="swatch-name">Brand Light Green</div><div class="swatch-hex">#55ffbe</div><div class="swatch-token">--brand-lg-100</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#d4ffef;"></div>
+        <div class="swatch-info"><div class="swatch-name">AI Surface</div><div class="swatch-hex">#d4ffef</div><div class="swatch-token">--brand-lg-25 / AI bg</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#f24456;"></div>
+        <div class="swatch-info"><div class="swatch-name">Accent Red</div><div class="swatch-hex">#f24456</div><div class="swatch-token">--accent-red / Error</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#f18710;"></div>
+        <div class="swatch-info"><div class="swatch-name">Accent Orange</div><div class="swatch-hex">#f18710</div><div class="swatch-token">--accent-orange / Warning</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#ffcc3d;"></div>
+        <div class="swatch-info"><div class="swatch-name">Accent Yellow</div><div class="swatch-hex">#ffcc3d</div><div class="swatch-token">--accent-yellow / Compliance</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#13ce66;"></div>
+        <div class="swatch-info"><div class="swatch-name">Accent Green</div><div class="swatch-hex">#13ce66</div><div class="swatch-token">--accent-green / Success</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#f3f5f5;border:1px solid #dce0e2;"></div>
+        <div class="swatch-info"><div class="swatch-name">Surface BG</div><div class="swatch-hex">#f3f5f5</div><div class="swatch-token">--brand-dg-5</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#b9c1c5;"></div>
+        <div class="swatch-info"><div class="swatch-name">Border Grey</div><div class="swatch-hex">#b9c1c5</div><div class="swatch-token">--brand-border</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#a0c7fe;"></div>
+        <div class="swatch-info"><div class="swatch-name">Secondary Blue</div><div class="swatch-hex">#a0c7fe</div><div class="swatch-token">--secondary-blue / Draft</div></div>
+      </div>
+      <div class="token-swatch">
+        <div class="swatch-color" style="background:#d6b4fc;"></div>
+        <div class="swatch-info"><div class="swatch-name">Secondary Purple</div><div class="swatch-hex">#d6b4fc</div><div class="swatch-token">--secondary-purple / Calc</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANEL ANATOMY ════════════ -->
+  <div class="component-group" id="panel-anatomy">
+    <div class="component-group-label">Chat Panel — Anatomy</div>
+    <div class="component-row">
+      <div>
+        <div class="frame-label">Panel — Idle / Greeting</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+              </div>
+              <span class="chat-header-title">AZIC Assist</span>
+              <span class="chat-header-badge">AI</span>
+              <div class="chat-header-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+              <div class="chat-header-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <div style="height:2px;background:var(--brand-dg-15);"></div>
+            <div class="chat-context-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <span><strong>Application MRN-2024-00441</strong> · Motor</span>
+            </div>
+            <div class="chat-thread" style="min-height:180px;">
+              <div class="time-divider">Today 09:41</div>
+              <div class="msg ai">
+                <div class="msg-avatar ai">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+                </div>
+                <div>
+                  <div class="bubble ai">I've reviewed the draft application. <strong>3 fields</strong> need attention and I've pre-filled <strong>8 others</strong> from the uploaded documents. Where would you like to start?</div>
+                  <div class="bubble-meta">09:41 · AZIC Assist</div>
+                  <div class="quick-replies">
+                    <span class="quick-chip">Review flagged fields</span>
+                    <span class="quick-chip">Show pre-filled data</span>
+                    <span class="quick-chip">Full summary</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <div class="chat-input-wrap">
+                <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <textarea rows="1" placeholder="Ask AZIC Assist…"></textarea>
+                <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              </div>
+              <button class="chat-send-btn disabled">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 0;display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="spec-pill">Width: 360px</span>
+          <span class="spec-pill">Header: 52px</span>
+          <span class="spec-pill">Input: 72px min</span>
+          <span class="spec-pill">Thread: flex-grow</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="frame-label">Panel — Processing (with bar)</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+              </div>
+              <span class="chat-header-title">AZIC Assist</span>
+              <span class="chat-header-badge">AI</span>
+              <div class="chat-header-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+              <div class="chat-header-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            </div>
+            <div class="chat-processing-bar"><div class="bar-fill"></div></div>
+            <div class="chat-thread" style="min-height:160px;">
+              <div class="msg user">
+                <div class="msg-avatar user">PD</div>
+                <div><div class="bubble user">Extract data from the uploaded survey report</div><div class="bubble-meta" style="text-align:right;">09:44 · You</div></div>
+              </div>
+              <div class="msg ai">
+                <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="shimmer-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Reviewing document…</div>
+                  <div class="shimmer-line w-full"></div>
+                  <div class="shimmer-line w-3q"></div>
+                  <div class="shimmer-line w-half"></div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <div class="chat-input-wrap"><textarea rows="1" placeholder="Ask AZIC Assist…" disabled style="opacity:.5;"></textarea></div>
+              <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANEL STATES ════════════ -->
+  <div class="component-group" id="panel-states">
+    <div class="component-group-label">Chat Panel — States</div>
+    <div class="component-row">
+      <!-- Message bubbles showcase -->
+      <div id="msg-ai">
+        <div class="frame-label">AI Message Bubble</div>
+        <div class="frame-content" style="width:320px;">
+          <div class="msg ai" style="max-width:100%;">
+            <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+            <div style="flex:1;">
+              <div class="bubble ai">Based on the uploaded survey report, the vessel age is <strong>18 years</strong>. This exceeds the standard maximum of 15 years for this cover class. I recommend flagging for senior underwriter review.</div>
+              <div class="bubble-meta">09:41 · AZIC Assist <span style="color:var(--brand-green);">· Confidence: 92%</span></div>
+              <div class="bubble-actions">
+                <span class="bubble-action-btn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</span>
+                <span class="bubble-action-btn">👍</span>
+                <span class="bubble-action-btn neg">👎</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="spec-pill">Left-aligned</span>
+            <span class="spec-pill">border-left: 2px green</span>
+            <span class="spec-pill">radius: 0 10 10 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-user">
+        <div class="frame-label">User Message Bubble</div>
+        <div class="frame-content" style="width:320px;">
+          <div class="msg user" style="max-width:100%;">
+            <div class="msg-avatar user">PD</div>
+            <div>
+              <div class="bubble user">What is the maximum sum insured for cargo class B2?</div>
+              <div class="bubble-meta" style="text-align:right;">09:43 · You</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="spec-pill">Right-aligned</span>
+            <span class="spec-pill">bg: #16303d</span>
+            <span class="spec-pill">radius: 10 0 10 10</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-typing">
+        <div class="frame-label">Typing Indicator</div>
+        <div class="frame-content" style="width:280px;">
+          <div class="msg ai" style="max-width:100%;">
+            <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--secondary-grey);">Appears after 400ms wait</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="spec-pill">1.2s animation</span>
+            <span class="spec-pill">stagger: 0.2s</span>
+            <span class="spec-pill">dot: 5px green</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-stream">
+        <div class="frame-label">Streaming State</div>
+        <div class="frame-content" style="width:320px;">
+          <div class="msg ai" style="max-width:100%;">
+            <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+            <div>
+              <div class="bubble ai">The sum insured maximum for cargo class B2 under the current guidelines is <strong>USD 2,500,000</strong> per voyage<span class="streaming-cursor"></span></div>
+              <div class="bubble-meta">Streaming · AZIC Assist</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="spec-pill">Word-by-word render</span>
+            <span class="spec-pill">cursor: 0.9s blink</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="msg-shimmer">
+        <div class="frame-label">Document Processing Shimmer</div>
+        <div class="frame-content" style="width:320px;">
+          <div class="msg ai" style="max-width:100%;">
+            <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+            <div style="flex:1;">
+              <div class="shimmer-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Analysing survey report…</div>
+              <div class="shimmer-line w-full"></div>
+              <div class="shimmer-line w-3q"></div>
+              <div class="shimmer-line w-half"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="spec-pill">Green shimmer</span>
+            <span class="spec-pill">1.4s loop</span>
+            <span class="spec-pill">bg: lg-25 → lg-50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PANEL ROLES ════════════ -->
+  <div class="component-group" id="panel-roles">
+    <div class="component-group-label">Chat Panel — Role Variants (Header)</div>
+    <div class="component-row">
+      <div>
+        <div class="frame-label">Role selector in header</div>
+        <div class="frame-content">
+          <div style="background:var(--surface-dark);padding:12px 16px;border-radius:var(--r-md);display:flex;align-items:center;gap:12px;">
+            <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+            <span style="color:#fff;font-weight:600;font-size:13px;flex:1;">AZIC Assist</span>
+            <div class="role-pills">
+              <span class="role-pill active">UW</span>
+              <span class="role-pill">Broker</span>
+              <span class="role-pill">Customer</span>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="padding:6px 12px;background:var(--brand-lg-25);border:1px solid rgba(46,216,142,.3);border-radius:var(--r-sm);font-size:12px;color:var(--surface-dark);">
+              <strong>Underwriter</strong> — Full AI scope
+            </div>
+            <div style="padding:6px 12px;background:#fff3e5;border:1px solid rgba(241,135,16,.3);border-radius:var(--r-sm);font-size:12px;color:#7c3000;">
+              <strong>Broker</strong> — Policy Q&amp;A, docs
+            </div>
+            <div style="padding:6px 12px;background:#eff6ff;border:1px solid rgba(160,199,254,.5);border-radius:var(--r-sm);font-size:12px;color:#1e3a8a;">
+              <strong>Customer</strong> — Plain language only
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ ACTION CARDS ════════════ -->
+  <div class="component-group" id="card-prefill">
+    <div class="component-group-label">Action Card — Field Prefill (High Confidence ≥85%)</div>
+    <div class="component-row">
+      <div style="width:320px;" id="card-prefill">
+        <div class="frame-label">Single field</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card conf-high">
+            <div class="action-card-header">
+              <div class="action-card-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+              <span class="action-card-title">Field Prefill</span>
+              <span class="conf-badge high">92%</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Vessel Name</div>
+                <div class="action-field-value">MV Athena Star</div>
+              </div>
+              <div class="action-field">
+                <div class="action-field-label">Year Built</div>
+                <div class="action-field-value">2006</div>
+              </div>
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Source: Survey Report v2.pdf, p.3</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accept">Accept</button>
+              <button class="ac-btn edit">Edit</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:340px;">
+        <div class="frame-label">Multi-field prefill</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card conf-high">
+            <div class="action-card-header">
+              <div class="action-card-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <span class="action-card-title">8 Fields Pre-filled from Document</span>
+              <span class="conf-badge high">89%</span>
+            </div>
+            <div class="action-card-body">
+              <table class="ac-table">
+                <tr><td>Vessel Name</td><td>MV Athena Star</td></tr>
+                <tr><td>Flag State</td><td>Panama</td></tr>
+                <tr><td>GRT</td><td>42,800 GT</td></tr>
+                <tr><td>Year Built</td><td>2006</td></tr>
+                <tr><td>Cargo Type</td><td>Bulk — Grain</td></tr>
+                <tr><td>Voyage Route</td><td>Singapore → Rotterdam</td></tr>
+                <tr><td>Declared Value</td><td>USD 4,200,000</td></tr>
+                <tr><td>Survey Date</td><td>12 Jun 2026</td></tr>
+              </table>
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Source: Marine Survey Report — Final.pdf</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accept">Accept All</button>
+              <button class="ac-btn edit">Review Each</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-risk">
+    <div class="component-group-label">Action Card — Risk Flag (Medium Confidence 65–84%)</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Risk anomaly</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card conf-med">
+            <div class="action-card-header">
+              <div class="action-card-icon orange"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+              <span class="action-card-title">Risk Flag — Cargo Value Anomaly</span>
+              <span class="conf-badge med">74%</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Finding</div>
+                <div class="action-field-value" style="font-size:12.5px;font-weight:400;">Declared cargo value (USD 4,200,000) is <strong>4× higher</strong> than average for this route and cargo class.</div>
+              </div>
+              <div class="action-field">
+                <div class="action-field-label">Rule Reference</div>
+                <div class="action-field-value" style="font-size:12px;">UW Guidelines v4.2 — Clause 3.1.7: Cargo variance threshold</div>
+              </div>
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Requires supporting documentation or manual verification</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accept">Acknowledge</button>
+              <button class="ac-btn edit">Add Note</button>
+              <button class="ac-btn dismiss">Dismiss Flag</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-rec">
+    <div class="component-group-label">Action Card — Recommendation (Low Confidence &lt;65% — Review Required)</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Low confidence — Accept locked</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card conf-low">
+            <div class="action-card-header">
+              <div class="action-card-icon red"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-red)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <span class="action-card-title">Premium Recommendation</span>
+              <span class="conf-badge low">48%</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Suggested Premium</div>
+                <div class="action-field-value">USD 38,500</div>
+              </div>
+              <div class="action-field">
+                <div class="action-field-label">Reasoning</div>
+                <div class="action-field-value" style="font-size:12px;font-weight:400;">I'm not certain about this estimate — the cargo type is unusual for this route and I have limited comparable data. Please verify manually.</div>
+              </div>
+            </div>
+            <div class="review-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Confidence below 65% — manual review required before acceptance
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Source: AI model estimate — limited comparable data</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn review-required">Review Required</button>
+              <button class="ac-btn edit">Enter Manual Value</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+        <div style="padding:8px 0;font-size:11px;color:var(--secondary-grey);">Accept button disabled until user opens source reference</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-doc">
+    <div class="component-group-label">Action Card — Document Summary</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Document summary</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card conf-high">
+            <div class="action-card-header">
+              <div class="action-card-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+              <span class="action-card-title">Document Summary — Survey Report</span>
+              <span class="conf-badge high">96%</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Document</div>
+                <div class="action-field-value" style="font-size:12px;">Marine Survey Report — Final.pdf (24 pages)</div>
+              </div>
+              <div style="margin-top:4px;">
+                <table class="ac-table">
+                  <tr><td>Survey Type</td><td>Pre-shipment</td></tr>
+                  <tr><td>Condition</td><td>Satisfactory</td></tr>
+                  <tr><td>Surveyor</td><td>Bureau Veritas</td></tr>
+                  <tr><td>Recommendations</td><td>2 minor items</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Extracted from pages 1, 3, 8, 19 of survey report</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accept">Use in Application</button>
+              <button class="ac-btn edit">View Full Doc</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-compliance">
+    <div class="component-group-label">Action Card — Compliance Alert</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Regulatory constraint</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card compliance">
+            <div class="action-card-header">
+              <div class="action-card-icon yellow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <span class="action-card-title">Compliance Alert</span>
+              <span class="conf-badge na">Rule-based</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Rule</div>
+                <div class="action-field-value" style="font-size:12.5px;font-weight:400;">Vessels older than 15 years require an <strong>Extended Survey Certificate</strong> before cover can be bound under Class B2.</div>
+              </div>
+              <div class="action-field">
+                <div class="action-field-label">Reference</div>
+                <div class="action-field-value" style="font-size:12px;">Marine UW Manual — Section 7.4.2 (Age & Condition)</div>
+              </div>
+            </div>
+            <div class="action-card-buttons">
+              <button class="ac-btn" style="background:#fffbeb;border:1px solid rgba(255,204,61,.5);color:#92400e;">Request Document</button>
+              <button class="ac-btn edit">Note Exception</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-draft">
+    <div class="component-group-label">Action Card — Draft Generation</div>
+    <div class="component-row">
+      <div style="width:360px;">
+        <div class="frame-label">AI-drafted communication</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card draft">
+            <div class="action-card-header">
+              <div class="action-card-icon blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-blue)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+              <span class="action-card-title">Draft — Additional Info Request</span>
+              <span class="conf-badge na">Draft</span>
+            </div>
+            <div class="draft-content">"Dear Mr. Patel, further to your application for Marine Cargo cover dated 20 June 2026, we require the following additional documentation before we can proceed: (1) Extended Survey Certificate for MV Athena Star, and (2) Cargo stowage plan for the voyage Singapore–Rotterdam. Please arrange submission within 5 business days…"</div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/></svg>AI-generated draft — review before sending</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn" style="background:var(--secondary-blue);color:#fff;">Use Draft</button>
+              <button class="ac-btn edit">Edit in Email</button>
+              <button class="ac-btn dismiss">Discard</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-calc">
+    <div class="component-group-label">Action Card — Calculation Result</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Premium breakdown</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card calc">
+            <div class="action-card-header">
+              <div class="action-card-icon purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-purple)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><line x1="9" y1="15" x2="15" y2="15"/></svg></div>
+              <span class="action-card-title">Premium Calculation</span>
+              <span class="conf-badge high">88%</span>
+            </div>
+            <div class="calc-breakdown">
+              <div class="calc-row"><span class="calc-label">Base rate (0.65%)</span><span class="calc-value">USD 27,300</span></div>
+              <div class="calc-row"><span class="calc-label">Age loading (+12%)</span><span class="calc-value">USD 3,276</span></div>
+              <div class="calc-row"><span class="calc-label">Route adjustment (+5%)</span><span class="calc-value">USD 1,365</span></div>
+              <div class="calc-row"><span class="calc-label">Claims history discount (–8%)</span><span class="calc-value">–USD 2,557</span></div>
+              <div class="calc-row"><span class="calc-label" style="font-weight:700;">Total Premium</span><span class="calc-value" style="color:var(--brand-green);">USD 29,384</span></div>
+            </div>
+            <div class="action-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Based on: cargo value, age loading table v2.4, 5yr claims history</div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accept">Apply to Application</button>
+              <button class="ac-btn edit">Adjust Manually</button>
+              <button class="ac-btn dismiss">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="component-group" id="card-accepted">
+    <div class="component-group-label">Action Card — Accepted State</div>
+    <div class="component-row">
+      <div style="width:320px;">
+        <div class="frame-label">Post-accept (10s undo window)</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="action-card accepted">
+            <div class="action-card-header">
+              <div class="action-card-icon" style="background:#dcfce7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="action-card-title" style="color:var(--accent-green);">Accepted — Field Prefill</span>
+              <span class="conf-badge na" style="background:#dcfce7;color:var(--accent-green);">09:44</span>
+            </div>
+            <div class="action-card-body">
+              <div class="action-field">
+                <div class="action-field-label">Applied to</div>
+                <div class="action-field-value" style="font-size:12px;">Vessel Name → "MV Athena Star"</div>
+              </div>
+            </div>
+            <div class="action-card-buttons">
+              <button class="ac-btn accepted-state">✓ Applied</button>
+              <button class="ac-btn dismiss" style="font-size:11px;">Undo (9s)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ INPUT BAR VARIANTS ════════════ -->
+  <div class="component-group" id="input-bar">
+    <div class="component-group-label">Input Bar — All Variants</div>
+    <div class="component-row">
+      <div style="width:360px;">
+        <div class="frame-label">Default (empty)</div>
+        <div class="frame-content" style="padding:0;border-top:1px solid var(--border-default);">
+          <div class="chat-input-bar">
+            <div class="chat-input-wrap">
+              <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <textarea rows="1" placeholder="Ask AZIC Assist…"></textarea>
+              <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:360px;">
+        <div class="frame-label">Focused (with text)</div>
+        <div class="frame-content" style="padding:0;border-top:1px solid var(--border-default);">
+          <div class="chat-input-bar">
+            <div class="chat-input-wrap" style="border-color:var(--brand-green);background:#fff;">
+              <svg class="chat-input-icon" style="color:var(--brand-green);" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <textarea rows="1" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12.5px;flex:1;resize:none;">What is the maximum sum insured for class B2?</textarea>
+              <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <button class="chat-send-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:360px;">
+        <div class="frame-label">With file attached</div>
+        <div class="frame-content" style="padding:0;border-top:1px solid var(--border-default);">
+          <div style="padding:8px 12px 0;">
+            <div class="file-chip" style="width:fit-content;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Survey_Report_Final.pdf
+              <span class="remove">×</span>
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <div class="chat-input-wrap">
+              <textarea rows="1" placeholder="Add a message (optional)…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12.5px;flex:1;resize:none;"></textarea>
+            </div>
+            <button class="chat-send-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:360px;">
+        <div class="frame-label">File uploading</div>
+        <div class="frame-content" style="padding:0;border-top:1px solid var(--border-default);">
+          <div style="padding:8px 12px 0;">
+            <div class="upload-chip">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+              <span style="font-size:11px;">Survey_Report_Final.pdf</span>
+              <div class="upload-progress-bar"><div class="upload-progress-fill"></div></div>
+              <span style="font-size:11px;color:var(--brand-green);font-weight:600;">65%</span>
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <div class="chat-input-wrap" style="opacity:.5;">
+              <textarea rows="1" placeholder="Uploading…" disabled style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12.5px;flex:1;resize:none;"></textarea>
+            </div>
+            <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ QUICK REPLY CHIPS ════════════ -->
+  <div class="component-group" id="quick-replies">
+    <div class="component-group-label">Quick Reply Chips — All States</div>
+    <div class="component-row">
+      <div style="width:360px;">
+        <div class="frame-label">Default suggestions</div>
+        <div class="frame-content">
+          <div class="quick-replies">
+            <span class="quick-chip">Review flagged fields</span>
+            <span class="quick-chip">Show pre-filled data</span>
+            <span class="quick-chip">Full summary</span>
+          </div>
+          <div style="margin-top:16px;font-size:11px;color:var(--secondary-grey);">Hover to see green fill state</div>
+        </div>
+      </div>
+      <div style="width:360px;">
+        <div class="frame-label">After selection (one selected)</div>
+        <div class="frame-content">
+          <div class="quick-replies">
+            <span class="quick-chip selected">Review flagged fields</span>
+            <span class="quick-chip" style="opacity:.4;cursor:default;">Show pre-filled data</span>
+            <span class="quick-chip" style="opacity:.4;cursor:default;">Full summary</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--secondary-grey);">Selected chip fades others — chips disappear after response</div>
+        </div>
+      </div>
+      <div style="width:360px;">
+        <div class="frame-label">Role-aware chips (Underwriter)</div>
+        <div class="frame-content">
+          <div class="quick-replies">
+            <span class="quick-chip">Check risk score</span>
+            <span class="quick-chip">Apply premium</span>
+            <span class="quick-chip">Flag for review</span>
+            <span class="quick-chip">Generate endorsement</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ HANDOFF STATES ════════════ -->
+  <div class="component-group" id="handoff">
+    <div class="component-group-label">Handoff — States</div>
+    <div class="component-row">
+      <div style="width:340px;">
+        <div class="frame-label">Step 1 — Escalating</div>
+        <div class="frame-content">
+          <div class="handoff-banner escalating">
+            <div class="typing-dot" style="background:var(--accent-orange);"></div>
+            This decision requires senior underwriter review. Escalating now and preparing context summary…
+          </div>
+        </div>
+      </div>
+      <div style="width:340px;">
+        <div class="frame-label">Step 3 — Waiting for agent</div>
+        <div class="frame-content">
+          <div class="handoff-banner waiting">
+            <div class="handoff-dot pulse" style="background:var(--accent-orange);"></div>
+            <div>Waiting for <strong>Underwriting Team</strong> · Est. response: 15 min<br><span style="font-size:11px;opacity:.7;">You can continue working — we'll notify you when they join</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="width:340px;">
+        <div class="frame-label">Step 4 — Agent joined</div>
+        <div class="frame-content">
+          <div class="handoff-banner joined">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--brand-green);flex-shrink:0;"></div>
+            <div><strong>Sarah M. (Senior UW)</strong> has joined · Full session context shared<br><span style="font-size:11px;color:var(--brand-dg-40);">Joined at 10:02 — handback expected within 30 min</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CONTEXT SUMMARY ════════════ -->
+  <div class="component-group" id="summary">
+    <div class="component-group-label">Context Summary Card (auto-generated at handoff)</div>
+    <div class="component-row">
+      <div style="width:360px;">
+        <div class="frame-label">Escalation summary</div>
+        <div class="frame-content">
+          <div class="summary-card">
+            <div class="summary-card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+              Session Summary — Escalated to UW Team
+            </div>
+            <div class="summary-item"><span class="summary-item-label">Application</span><span class="summary-item-value">MRN-2024-00441 · Marine Cargo</span></div>
+            <div class="summary-item"><span class="summary-item-label">Insured name</span><span class="summary-item-value masked">**** Masked — see case record</span></div>
+            <div class="summary-item"><span class="summary-item-label">Outstanding issue</span><span class="summary-item-value">Premium recommendation — low confidence (48%)</span></div>
+            <div class="summary-item"><span class="summary-item-label">Fields pre-filled</span><span class="summary-item-value">8 accepted, 0 dismissed</span></div>
+            <div class="summary-item"><span class="summary-item-label">Risk flags raised</span><span class="summary-item-value">2 (cargo value anomaly, vessel age)</span></div>
+            <div class="summary-item"><span class="summary-item-label">Escalated at</span><span class="summary-item-value">10:01, Jun 25 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ FULL CONVERSATION ════════════ -->
+  <div class="component-group" id="full-convo">
+    <div class="component-group-label">Full Conversation — Assembled View</div>
+    <div class="component-row">
+      <div class="full-chat">
+        <div class="frame-label">Live interactive chat panel</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="chat-panel">
+            <div class="chat-header">
+              <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+              <span class="chat-header-title">AZIC Assist</span>
+              <span class="chat-header-badge">AI</span>
+              <div class="role-pills" style="margin-right:4px;">
+                <span class="role-pill active" onclick="this.parentElement.querySelectorAll('.role-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">UW</span>
+                <span class="role-pill" onclick="this.parentElement.querySelectorAll('.role-pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Broker</span>
+              </div>
+              <div class="chat-header-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            </div>
+            <div class="chat-processing-bar"><div class="bar-fill"></div></div>
+            <div class="chat-context-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <span><strong>MRN-2024-00441</strong> · Marine · 3 flags · 8 pre-fills</span>
+            </div>
+            <div class="chat-thread">
+              <div class="time-divider">Today 09:41</div>
+              <div class="msg ai">
+                <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="bubble ai">I've reviewed this application. <strong>2 risk flags</strong> need your attention and I've pre-filled <strong>8 fields</strong> from the survey report.</div>
+                  <div class="bubble-meta">09:41 · AZIC Assist</div>
+                  <div class="quick-replies">
+                    <span class="quick-chip" onclick="selectChip(this)">Show risk flags</span>
+                    <span class="quick-chip" onclick="selectChip(this)">Review pre-fills</span>
+                  </div>
+                </div>
+              </div>
+              <div class="msg user">
+                <div class="msg-avatar user">PD</div>
+                <div><div class="bubble user">Show me the vessel age flag</div><div class="bubble-meta" style="text-align:right;">09:43</div></div>
+              </div>
+              <div class="msg ai">
+                <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="action-card conf-med" style="margin-bottom:6px;">
+                    <div class="action-card-header">
+                      <div class="action-card-icon orange"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+                      <span class="action-card-title">Risk Flag — Vessel Age</span>
+                      <span class="conf-badge med">81%</span>
+                    </div>
+                    <div class="action-card-body">
+                      <div class="action-field"><div class="action-field-label">Finding</div><div class="action-field-value" style="font-size:12px;font-weight:400;">Vessel is <strong>18 years old</strong> — exceeds 15yr maximum for Class B2 without Extended Survey Certificate.</div></div>
+                    </div>
+                    <div class="action-card-buttons">
+                      <button class="ac-btn accept" onclick="acceptCard(this)">Acknowledge</button>
+                      <button class="ac-btn edit">Request Doc</button>
+                      <button class="ac-btn dismiss">Dismiss</button>
+                    </div>
+                  </div>
+                  <div class="bubble-meta">09:43 · AZIC Assist</div>
+                </div>
+              </div>
+              <div class="handoff-banner joined" style="margin:4px 0;">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--brand-green);flex-shrink:0;"></div>
+                <span style="font-size:12px;"><strong>Sarah M.</strong> joined the session</span>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <div class="chat-input-wrap">
+                <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <textarea id="mainInput" rows="1" placeholder="Ask AZIC Assist…" oninput="toggleSend(this)"></textarea>
+              </div>
+              <button id="sendBtn" class="chat-send-btn disabled" onclick="sendMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5" id="sendIcon"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MOCKUPS
+  ═══════════════════════════════════════════════════════ -->
+
+  <div style="margin-top:24px;margin-bottom:12px;">
+    <div class="section-title" style="font-size:18px;">Mockups</div>
+    <div class="section-sub">End-to-end screen mockups — AI chat panel embedded in real AZIC workflows</div>
+  </div>
+
+  <!-- ── AI WORKSPACE ──────────────────────────────────── -->
+  <div class="component-group" id="mock-ai-workspace">
+    <div class="component-group-label">Mockup 0 — AZIC AI Workspace · Full-screen dedicated view</div>
+    <div class="component-row" style="align-items:stretch;">
+      <div style="flex:1;min-width:0;">
+        <div class="frame-label">AI Workspace — primary AI interface with contextual panels</div>
+        <div class="frame-content" style="padding:0;overflow:hidden;">
+          <div style="display:flex;height:640px;background:#0d1e26;font-family:'Poppins',sans-serif;">
+
+            <!-- ── Left rail ── -->
+            <div style="width:56px;background:#0a1820;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;border-right:1px solid rgba(255,255,255,.05);">
+              <!-- Logo -->
+              <div style="width:32px;height:32px;background:var(--brand-green);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+              </div>
+              <!-- Nav icons -->
+              <div title="AI Workspace" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(46,216,142,.15);border-radius:8px;cursor:pointer;border-left:3px solid var(--brand-green);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div title="Applications" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:4px;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3a5a6a" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+              </div>
+              <div title="Queue" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3a5a6a" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </div>
+              <div title="Analytics" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3a5a6a" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <div style="flex:1;"></div>
+              <!-- Avatar -->
+              <div style="width:30px;height:30px;border-radius:50%;background:var(--brand-green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;">PD</div>
+            </div>
+
+            <!-- ── Session list panel ── -->
+            <div style="width:230px;background:#111e27;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow:hidden;">
+              <div style="padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);">
+                <div style="font-size:11px;font-weight:700;color:var(--brand-green);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;">AI Workspace</div>
+                <button style="width:100%;padding:8px;background:var(--brand-green);border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  New Session
+                </button>
+              </div>
+              <div style="padding:10px 8px;flex:1;overflow-y:auto;">
+                <div style="font-size:10px;color:#3a5a6a;font-weight:600;text-transform:uppercase;letter-spacing:.7px;padding:0 6px;margin-bottom:6px;">Today</div>
+                <!-- Active session -->
+                <div style="background:rgba(46,216,142,.10);border:1px solid rgba(46,216,142,.2);border-radius:6px;padding:9px 10px;margin-bottom:4px;cursor:pointer;">
+                  <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MCG-2026-00441 Review</div>
+                  <div style="font-size:10.5px;color:var(--brand-green);">Marine Cargo · Active</div>
+                  <div style="font-size:10px;color:#4a6a7a;margin-top:2px;">2 flags · 8 pre-fills</div>
+                </div>
+                <div style="padding:8px 10px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:12px;color:#b0c8d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">MTR-2026-08812 Quote</div>
+                  <div style="font-size:10px;color:#3a5a6a;margin-top:2px;">Motor · 09:20</div>
+                </div>
+                <div style="padding:8px 10px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:12px;color:#b0c8d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">POL-MTR-2026-00441 Renewal</div>
+                  <div style="font-size:10px;color:#3a5a6a;margin-top:2px;">Motor · 09:10</div>
+                </div>
+                <div style="font-size:10px;color:#3a5a6a;font-weight:600;text-transform:uppercase;letter-spacing:.7px;padding:10px 6px 6px;margin-top:4px;">Yesterday</div>
+                <div style="padding:8px 10px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:12px;color:#7a9aab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">CLM-2026-00821 FNOL</div>
+                  <div style="font-size:10px;color:#3a5a6a;margin-top:2px;">Claims · Jun 24</div>
+                </div>
+                <div style="padding:8px 10px;cursor:pointer;border-radius:6px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'">
+                  <div style="font-size:12px;color:#7a9aab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Fire Policy Endorsement</div>
+                  <div style="font-size:10px;color:#3a5a6a;margin-top:2px;">Fire · Jun 24</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Main AI chat area ── -->
+            <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+
+              <!-- Workspace top bar -->
+              <div style="background:#1a2e38;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;">
+                <div style="flex:1;">
+                  <div style="font-size:11px;color:#4a6a7a;">Marine Cargo · MCG-2026-00441</div>
+                  <div style="font-size:14px;font-weight:700;color:#fff;margin-top:1px;">MV Athena Star — Bulk Grain · SIN → RTM</div>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <span style="font-size:10px;background:rgba(242,68,86,.15);border:1px solid rgba(242,68,86,.3);color:#f88;padding:3px 10px;border-radius:var(--r-pill);">2 Flags</span>
+                  <span style="font-size:10px;background:rgba(46,216,142,.15);border:1px solid rgba(46,216,142,.3);color:var(--brand-green);padding:3px 10px;border-radius:var(--r-pill);">8 Pre-fills</span>
+                  <div style="width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 4px;"></div>
+                  <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:#4a6a7a;cursor:pointer;border-radius:4px;" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='transparent'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI mode pills -->
+              <div style="background:#162530;padding:8px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;">
+                <span style="font-size:10px;color:#4a6a7a;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-right:4px;">Mode:</span>
+                <span style="font-size:11px;background:rgba(46,216,142,.15);border:1px solid rgba(46,216,142,.3);color:var(--brand-green);padding:3px 12px;border-radius:var(--r-pill);font-weight:600;cursor:pointer;">Underwriter</span>
+                <span style="font-size:11px;color:#4a6a7a;padding:3px 12px;border-radius:var(--r-pill);cursor:pointer;border:1px solid transparent;" onmouseover="this.style.borderColor='rgba(255,255,255,.1)'" onmouseout="this.style.borderColor='transparent'">Document Extract</span>
+                <span style="font-size:11px;color:#4a6a7a;padding:3px 12px;border-radius:var(--r-pill);cursor:pointer;border:1px solid transparent;" onmouseover="this.style.borderColor='rgba(255,255,255,.1)'" onmouseout="this.style.borderColor='transparent'">Premium Calc</span>
+                <span style="font-size:11px;color:#4a6a7a;padding:3px 12px;border-radius:var(--r-pill);cursor:pointer;border:1px solid transparent;" onmouseover="this.style.borderColor='rgba(255,255,255,.1)'" onmouseout="this.style.borderColor='transparent'">Compliance Check</span>
+                <div style="flex:1;"></div>
+                <span style="font-size:10px;color:#4a6a7a;">Context: <strong style="color:#b0c8d4;">Marine Survey.pdf</strong></span>
+              </div>
+
+              <!-- Message thread -->
+              <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;">
+
+                <!-- AI opening message -->
+                <div style="display:flex;gap:10px;max-width:75%;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:var(--brand-green);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;color:var(--brand-green);font-weight:600;margin-bottom:4px;">AZIC Assist · 11:55</div>
+                    <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.08);border-left:2px solid var(--brand-green);border-radius:0 10px 10px 10px;padding:12px 14px;font-size:12.5px;color:#d0e4ec;line-height:1.55;">
+                      I've reviewed the <strong style="color:#fff;">Marine Survey Report</strong> and the slip. Here's what I found:
+                      <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--brand-green);">✓</span> <span>8 fields pre-filled from document</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--accent-orange);">⚠</span> <span>Cargo value anomaly — 4× route average</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--accent-orange);">⚠</span> <span>Vessel age 18 yrs — Extended Survey required</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span style="color:var(--secondary-purple);">◆</span> <span>Estimated premium: <strong style="color:#fff;">USD 30,576</strong></span></div>
+                      </div>
+                    </div>
+                    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+                      <span class="quick-chip" style="font-size:11px;border-color:rgba(46,216,142,.2);color:#d0e4ec;background:rgba(46,216,142,.08);">Review flags</span>
+                      <span class="quick-chip" style="font-size:11px;border-color:rgba(46,216,142,.2);color:#d0e4ec;background:rgba(46,216,142,.08);">Apply premium</span>
+                      <span class="quick-chip" style="font-size:11px;border-color:rgba(46,216,142,.2);color:#d0e4ec;background:rgba(46,216,142,.08);">Request survey cert</span>
+                      <span class="quick-chip" style="font-size:11px;border-color:rgba(46,216,142,.2);color:#d0e4ec;background:rgba(46,216,142,.08);">Bind cover</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- User message -->
+                <div style="display:flex;gap:10px;max-width:65%;align-self:flex-end;flex-direction:row-reverse;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px;">PD</div>
+                  <div>
+                    <div style="font-size:11px;color:#4a6a7a;font-weight:600;margin-bottom:4px;text-align:right;">You · 11:56</div>
+                    <div style="background:var(--surface-dark);border-radius:10px 0 10px 10px;padding:10px 14px;font-size:12.5px;color:#fff;line-height:1.5;">Apply the premium and generate the Extended Survey request letter</div>
+                  </div>
+                </div>
+
+                <!-- AI action cards response -->
+                <div style="display:flex;gap:10px;max-width:80%;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:var(--brand-green);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-size:11px;color:var(--brand-green);font-weight:600;margin-bottom:6px;">AZIC Assist · 11:56</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <!-- Calc card (dark themed) -->
+                      <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--secondary-purple);border-radius:var(--r-md);overflow:hidden;">
+                        <div style="padding:10px 14px 8px;display:flex;align-items:center;gap:8px;">
+                          <div style="width:24px;height:24px;border-radius:4px;background:#2a1e38;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-purple)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                          <span style="font-size:12.5px;font-weight:600;color:#e0eaee;flex:1;">Premium Applied</span>
+                          <span style="font-size:10px;background:rgba(19,206,102,.15);border:1px solid rgba(19,206,102,.3);color:var(--accent-green);padding:2px 8px;border-radius:var(--r-pill);font-weight:700;">Applied ✓</span>
+                        </div>
+                        <div style="padding:0 14px 10px;font-size:13px;font-weight:700;color:var(--brand-green);">USD 30,576</div>
+                      </div>
+                      <!-- Draft letter card -->
+                      <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--secondary-blue);border-radius:var(--r-md);overflow:hidden;">
+                        <div style="padding:10px 14px 8px;display:flex;align-items:center;gap:8px;">
+                          <div style="width:24px;height:24px;border-radius:4px;background:#1e2a38;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-blue)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+                          <span style="font-size:12.5px;font-weight:600;color:#e0eaee;flex:1;">Draft — Extended Survey Request</span>
+                          <span style="font-size:10px;background:rgba(160,199,254,.12);border:1px solid rgba(160,199,254,.25);color:var(--secondary-blue);padding:2px 8px;border-radius:var(--r-pill);">Draft</span>
+                        </div>
+                        <div style="margin:0 14px 10px;font-size:11.5px;color:#7a9aab;font-style:italic;background:#0f1e28;border-radius:4px;padding:9px 11px;border-left:2px solid var(--secondary-blue);line-height:1.55;">"Dear Mr. Patel, we require an Extended Survey Certificate for MV Athena Star prior to binding cover under Class B2. Please submit the certificate within 5 business days…"</div>
+                        <div style="padding:8px 14px 12px;display:flex;gap:6px;border-top:1px solid rgba(255,255,255,.05);">
+                          <button style="font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;background:var(--secondary-blue);color:#000;border:none;border-radius:var(--r-sm);padding:5px 14px;cursor:pointer;">Send via Email</button>
+                          <button style="font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:600;background:transparent;border:1px solid #3a5a6a;color:#b0c8d4;border-radius:var(--r-sm);padding:5px 14px;cursor:pointer;">Edit Draft</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Input bar (dark) -->
+              <div style="padding:12px 20px;border-top:1px solid rgba(255,255,255,.06);background:#162530;display:flex;gap:10px;align-items:flex-end;flex-shrink:0;">
+                <div style="flex:1;background:#1a2e38;border:1.5px solid rgba(255,255,255,.1);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:center;gap:8px;transition:border-color .15s;">
+                  <svg style="color:#3a5a6a;flex-shrink:0;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                  <input type="text" placeholder="Ask AZIC Assist anything about this application…" style="flex:1;border:none;outline:none;background:transparent;font-family:'Poppins',sans-serif;font-size:12.5px;color:#d0e4ec;" onfocus="this.parentElement.style.borderColor='var(--brand-green)'" onblur="this.parentElement.style.borderColor='rgba(255,255,255,.1)'"/>
+                  <svg style="color:#3a5a6a;cursor:pointer;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+                </div>
+                <button style="width:40px;height:40px;background:var(--brand-green);border:none;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- ── Right context panel ── -->
+            <div style="width:260px;background:#111e27;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;">
+              <div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);">
+                <div style="font-size:10px;font-weight:700;color:#4a6a7a;text-transform:uppercase;letter-spacing:.8px;">Application Context</div>
+              </div>
+              <div style="flex:1;overflow-y:auto;padding:12px;">
+
+                <!-- Quick stats -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                  <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;">
+                    <div style="font-size:10px;color:#4a6a7a;margin-bottom:3px;">Pre-fills</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--brand-green);">8</div>
+                  </div>
+                  <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;">
+                    <div style="font-size:10px;color:#4a6a7a;margin-bottom:3px;">Flags</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--accent-orange);">2</div>
+                  </div>
+                  <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;">
+                    <div style="font-size:10px;color:#4a6a7a;margin-bottom:3px;">AI Actions</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--secondary-blue);">5</div>
+                  </div>
+                  <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px;">
+                    <div style="font-size:10px;color:#4a6a7a;margin-bottom:3px;">Completion</div>
+                    <div style="font-size:20px;font-weight:700;color:#fff;">74%</div>
+                  </div>
+                </div>
+
+                <!-- Documents -->
+                <div style="font-size:10px;font-weight:700;color:#4a6a7a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Documents</div>
+                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;background:#1a2e38;border-radius:5px;cursor:pointer;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                    <span style="font-size:11px;color:#b0c8d4;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Marine Survey Report</span>
+                    <span style="font-size:9px;background:rgba(46,216,142,.15);color:var(--brand-green);padding:1px 5px;border-radius:3px;flex-shrink:0;">Used</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;background:#1a2e38;border-radius:5px;cursor:pointer;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                    <span style="font-size:11px;color:#b0c8d4;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Cargo Slip</span>
+                    <span style="font-size:9px;background:rgba(160,199,254,.12);color:var(--secondary-blue);padding:1px 5px;border-radius:3px;flex-shrink:0;">Used</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;background:#1a2e38;border-radius:5px;cursor:pointer;border:1px dashed rgba(255,255,255,.08);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3a5a6a" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span style="font-size:11px;color:#3a5a6a;">Upload Extended Survey Cert</span>
+                  </div>
+                </div>
+
+                <!-- AI confidence summary -->
+                <div style="font-size:10px;font-weight:700;color:#4a6a7a;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">AI Confidence</div>
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:#b0c8d4;">Pre-fill accuracy</span><span style="color:var(--brand-green);font-weight:600;">89%</span></div>
+                    <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;"><div style="height:100%;width:89%;background:var(--brand-green);border-radius:2px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:#b0c8d4;">Premium calc</span><span style="color:var(--brand-green);font-weight:600;">88%</span></div>
+                    <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;"><div style="height:100%;width:88%;background:var(--brand-green);border-radius:2px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:#b0c8d4;">Risk flags</span><span style="color:var(--accent-orange);font-weight:600;">74%</span></div>
+                    <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;"><div style="height:100%;width:74%;background:var(--accent-orange);border-radius:2px;"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOTOR INSURANCE ───────────────────────────────── -->
+  <div class="component-group" id="mock-motor">
+    <div class="component-group-label">Mockup 1 — Motor Insurance · New Business Quote</div>
+    <div class="component-row" style="align-items:stretch;">
+
+      <!-- Main workspace pane -->
+      <div style="flex:1;min-width:0;">
+        <div class="frame-label">Application workspace + AI panel (side-by-side)</div>
+        <div class="frame-content" style="padding:0;overflow:hidden;">
+          <div style="display:flex;height:580px;background:var(--brand-dg-5);">
+
+            <!-- Left: form area -->
+            <div style="flex:1;overflow-y:auto;padding:20px;border-right:1px solid var(--border-default);">
+              <!-- Top bar -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div>
+                  <div style="font-size:11px;color:var(--secondary-grey);">New Business · Motor</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--surface-dark);">MTR-2026-08812</div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <span style="font-size:11px;background:#fff4e5;border:1px solid rgba(241,135,16,.3);color:#92400e;padding:3px 10px;border-radius:var(--r-pill);font-weight:600;">Draft</span>
+                  <span style="font-size:11px;background:var(--brand-lg-25);border:1px solid rgba(46,216,142,.3);color:var(--surface-dark);padding:3px 10px;border-radius:var(--r-pill);font-weight:600;">AI: 5 suggestions</span>
+                </div>
+              </div>
+
+              <!-- Progress steps -->
+              <div style="display:flex;gap:0;margin-bottom:20px;">
+                <div style="flex:1;text-align:center;">
+                  <div style="height:3px;background:var(--brand-green);border-radius:2px 0 0 2px;"></div>
+                  <div style="font-size:10px;font-weight:600;color:var(--brand-green);margin-top:5px;">Proposer</div>
+                </div>
+                <div style="flex:1;text-align:center;">
+                  <div style="height:3px;background:var(--brand-green);"></div>
+                  <div style="font-size:10px;font-weight:600;color:var(--brand-green);margin-top:5px;">Vehicle</div>
+                </div>
+                <div style="flex:1;text-align:center;">
+                  <div style="height:3px;background:var(--brand-green);"></div>
+                  <div style="font-size:10px;font-weight:600;color:var(--brand-green);margin-top:5px;">Drivers</div>
+                </div>
+                <div style="flex:1;text-align:center;">
+                  <div style="height:3px;background:var(--brand-dg-15);border-radius:0 2px 2px 0;"></div>
+                  <div style="font-size:10px;color:var(--brand-dg-40);margin-top:5px;">Premium</div>
+                </div>
+              </div>
+
+              <!-- Form section: Vehicle -->
+              <div style="background:var(--surface-card);border:1px solid var(--border-default);border-radius:var(--r-md);padding:14px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:700;color:var(--surface-dark);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                  Vehicle Details
+                  <span style="font-size:10px;color:var(--brand-green);background:var(--brand-lg-25);padding:2px 8px;border-radius:var(--r-pill);">AI pre-filled</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div>
+                    <div style="font-size:10px;font-weight:600;color:var(--secondary-grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Registration No.</div>
+                    <div style="background:var(--brand-lg-25);border:1.5px solid var(--brand-green);border-radius:var(--r-sm);padding:7px 10px;font-size:13px;font-weight:600;color:var(--surface-dark);">KA 03 MX 7821</div>
+                    <div style="font-size:10px;color:var(--brand-green);margin-top:2px;">✓ AI filled from RC document</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;font-weight:600;color:var(--secondary-grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Make & Model</div>
+                    <div style="background:var(--brand-lg-25);border:1.5px solid var(--brand-green);border-radius:var(--r-sm);padding:7px 10px;font-size:13px;font-weight:600;color:var(--surface-dark);">Maruti Suzuki Brezza</div>
+                    <div style="font-size:10px;color:var(--brand-green);margin-top:2px;">✓ AI filled from RC document</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;font-weight:600;color:var(--secondary-grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Year of Manufacture</div>
+                    <div style="background:var(--brand-lg-25);border:1.5px solid var(--brand-green);border-radius:var(--r-sm);padding:7px 10px;font-size:13px;font-weight:600;color:var(--surface-dark);">2022</div>
+                    <div style="font-size:10px;color:var(--brand-green);margin-top:2px;">✓ AI filled</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;font-weight:600;color:var(--secondary-grey);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">IDV (₹)</div>
+                    <div style="background:#fff4e5;border:1.5px solid var(--accent-orange);border-radius:var(--r-sm);padding:7px 10px;font-size:13px;font-weight:600;color:var(--surface-dark);">₹ 9,80,000</div>
+                    <div style="font-size:10px;color:var(--accent-orange);margin-top:2px;">⚠ Review suggested value</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Risk flag inline -->
+              <div style="background:#fff4e5;border:1px solid rgba(241,135,16,.3);border-left:3px solid var(--accent-orange);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:#92400e;display:flex;gap:8px;margin-bottom:12px;">
+                <svg width="14" height="14" style="flex-shrink:0;margin-top:2px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div><strong>IDV Note:</strong> Market average for this model/year is ₹10,40,000. AI recommends reviewing declared value. <span style="text-decoration:underline;cursor:pointer;font-weight:600;">Ask AZIC Assist →</span></div>
+              </div>
+
+              <!-- Drivers summary row -->
+              <div style="background:var(--surface-card);border:1px solid var(--border-default);border-radius:var(--r-md);padding:14px;">
+                <div style="font-size:12px;font-weight:700;color:var(--surface-dark);margin-bottom:10px;">Driver Details</div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--brand-dg-5);border-radius:var(--r-sm);margin-bottom:6px;">
+                  <div style="width:30px;height:30px;border-radius:50%;background:var(--surface-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--brand-green);flex-shrink:0;">RK</div>
+                  <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:var(--surface-dark);">Rajesh Kumar</div><div style="font-size:11px;color:var(--secondary-grey);">Primary · Age 38 · 12 yrs exp</div></div>
+                  <span style="font-size:10px;background:var(--brand-lg-25);color:var(--surface-dark);padding:2px 8px;border-radius:var(--r-pill);font-weight:600;">Verified</span>
+                </div>
+                <button style="width:100%;padding:8px;background:transparent;border:1.5px dashed var(--border-default);border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:12px;color:var(--secondary-grey);cursor:pointer;">+ Add driver</button>
+              </div>
+            </div>
+
+            <!-- Right: AI panel -->
+            <div style="width:320px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface-card);">
+              <div class="chat-header">
+                <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <span class="chat-header-title">AZIC Assist</span>
+                <span class="chat-header-badge">Motor</span>
+              </div>
+              <div style="height:2px;background:var(--brand-dg-15);"></div>
+              <div class="chat-thread" style="flex:1;max-height:none;">
+                <div class="time-divider">Today 11:20</div>
+                <div class="msg ai">
+                  <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                  <div>
+                    <div class="bubble ai">I've extracted data from the <strong>RC document</strong>. 4 fields auto-filled. The <strong>IDV seems low</strong> — want me to suggest market value?</div>
+                    <div class="bubble-meta">11:20 · AI</div>
+                    <div class="quick-replies">
+                      <span class="quick-chip">Suggest IDV</span>
+                      <span class="quick-chip">Check NCB</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="msg user">
+                  <div class="msg-avatar user">RB</div>
+                  <div><div class="bubble user">Suggest IDV</div><div class="bubble-meta" style="text-align:right;">11:21</div></div>
+                </div>
+                <div class="msg ai">
+                  <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                  <div>
+                    <div class="action-card conf-med" style="margin-bottom:4px;">
+                      <div class="action-card-header">
+                        <div class="action-card-icon orange"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                        <span class="action-card-title">Suggested IDV</span>
+                        <span class="conf-badge med">76%</span>
+                      </div>
+                      <div class="action-card-body">
+                        <div class="action-field"><div class="action-field-label">Market value</div><div class="action-field-value">₹ 10,40,000</div></div>
+                      </div>
+                      <div class="action-card-buttons">
+                        <button class="ac-btn accept">Apply</button>
+                        <button class="ac-btn dismiss">Keep current</button>
+                      </div>
+                    </div>
+                    <div class="bubble-meta">11:21 · AI</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <div class="chat-input-wrap">
+                  <textarea rows="1" placeholder="Ask about this application…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12px;flex:1;resize:none;"></textarea>
+                </div>
+                <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MARINE CARGO ───────────────────────────────────── -->
+  <div class="component-group" id="mock-marine">
+    <div class="component-group-label">Mockup 2 — Marine Cargo · Underwriter Review</div>
+    <div class="component-row" style="align-items:stretch;">
+      <div style="flex:1;min-width:0;">
+        <div class="frame-label">Underwriter dashboard + AI action cards</div>
+        <div class="frame-content" style="padding:0;overflow:hidden;">
+          <div style="display:flex;height:560px;background:var(--surface-dark);">
+
+            <!-- Narrow sidebar (nav rail) -->
+            <div style="width:52px;background:#0d1e26;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:16px;border-right:1px solid rgba(255,255,255,.06);">
+              <div style="width:28px;height:28px;background:var(--brand-green);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+              </div>
+              <div style="height:1px;width:28px;background:rgba(255,255,255,.1);"></div>
+              <div title="Applications" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(46,216,142,.15);border-radius:6px;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+              </div>
+              <div title="Quotes" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a6a7a" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
+              <div title="Reports" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a6a7a" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+            </div>
+
+            <!-- Main area -->
+            <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+              <!-- Top bar -->
+              <div style="background:#1a2e38;padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);">
+                <div style="font-size:12px;color:#7a9aab;">Marine Cargo</div>
+                <div style="color:rgba(255,255,255,.3);">›</div>
+                <div style="font-size:12px;color:#fff;font-weight:600;">MCG-2026-00441</div>
+                <div style="margin-left:auto;display:flex;gap:6px;">
+                  <span style="font-size:10px;background:rgba(242,68,86,.15);border:1px solid rgba(242,68,86,.3);color:#f88;padding:3px 10px;border-radius:var(--r-pill);">2 Flags</span>
+                  <span style="font-size:10px;background:rgba(46,216,142,.15);border:1px solid rgba(46,216,142,.3);color:var(--brand-green);padding:3px 10px;border-radius:var(--r-pill);">8 Pre-fills</span>
+                </div>
+              </div>
+
+              <div style="padding:14px;flex:1;overflow-y:auto;">
+                <!-- Application summary card -->
+                <div style="background:#1a2e38;border:1px solid rgba(255,255,255,.08);border-radius:var(--r-md);padding:14px;margin-bottom:12px;">
+                  <div style="font-size:11px;font-weight:700;color:var(--brand-green);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Application Summary</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div><div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">Vessel</div><div style="font-size:12px;font-weight:600;color:#fff;">MV Athena Star</div></div>
+                    <div><div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">Cargo</div><div style="font-size:12px;font-weight:600;color:#fff;">Bulk Grain</div></div>
+                    <div><div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">Route</div><div style="font-size:12px;font-weight:600;color:#fff;">SIN → RTM</div></div>
+                    <div><div style="font-size:10px;color:#4a6a7a;margin-bottom:2px;">Sum Insured</div><div style="font-size:12px;font-weight:600;color:var(--brand-green);">USD 4,200,000</div></div>
+                  </div>
+                </div>
+
+                <!-- AI action cards stack -->
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <div class="action-card conf-med" style="background:#1a2e38;border-color:rgba(255,255,255,.08);">
+                    <div class="action-card-header">
+                      <div class="action-card-icon orange"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+                      <span class="action-card-title" style="color:#e0eaee;">Risk Flag — Cargo Value</span>
+                      <span class="conf-badge med">74%</span>
+                    </div>
+                    <div class="action-card-body"><div class="action-field"><div class="action-field-label">Finding</div><div class="action-field-value" style="font-size:12px;font-weight:400;color:#b0c8d4;">Declared value is <strong style="color:#fff;">4× higher</strong> than route average</div></div></div>
+                    <div class="action-card-buttons">
+                      <button class="ac-btn accept">Acknowledge</button>
+                      <button class="ac-btn edit" style="color:#b0c8d4;border-color:#3a5a6a;">Add Note</button>
+                    </div>
+                  </div>
+                  <div class="action-card calc" style="background:#1a2e38;border-color:rgba(255,255,255,.08);">
+                    <div class="action-card-header">
+                      <div class="action-card-icon purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-purple)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                      <span class="action-card-title" style="color:#e0eaee;">Premium Calculation</span>
+                      <span class="conf-badge high">88%</span>
+                    </div>
+                    <div class="calc-breakdown" style="color:#b0c8d4;">
+                      <div class="calc-row" style="border-color:rgba(255,255,255,.06);"><span class="calc-label" style="color:#4a6a7a;">Base rate (0.65%)</span><span class="calc-value" style="color:#b0c8d4;">USD 27,300</span></div>
+                      <div class="calc-row" style="border-color:rgba(255,255,255,.06);"><span class="calc-label" style="color:#4a6a7a;">Age loading (+12%)</span><span class="calc-value" style="color:#b0c8d4;">USD 3,276</span></div>
+                      <div class="calc-row" style="border-color:rgba(255,255,255,.06);"><span class="calc-label" style="color:#b0c8d4;font-weight:700;">Total</span><span class="calc-value" style="color:var(--brand-green);font-size:14px;">USD 30,576</span></div>
+                    </div>
+                    <div class="action-card-buttons">
+                      <button class="ac-btn accept">Apply Premium</button>
+                      <button class="ac-btn edit" style="color:#b0c8d4;border-color:#3a5a6a;">Adjust</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI chat panel -->
+            <div style="width:300px;flex-shrink:0;border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;background:var(--surface-card);">
+              <div class="chat-header">
+                <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <span class="chat-header-title">AI Assist</span>
+                <span class="chat-header-badge">UW</span>
+              </div>
+              <div class="chat-processing-bar"><div class="bar-fill"></div></div>
+              <div class="chat-thread" style="flex:1;max-height:none;">
+                <div class="msg ai">
+                  <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                  <div>
+                    <div class="bubble ai">Marine survey extracted. <strong>2 flags raised</strong>, premium calculated at <strong>USD 30,576</strong>. Ready to bind?</div>
+                    <div class="bubble-meta">11:55 · AI</div>
+                    <div class="quick-replies">
+                      <span class="quick-chip">Bind cover</span>
+                      <span class="quick-chip">Escalate</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <div class="chat-input-wrap"><textarea rows="1" placeholder="Message…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12px;flex:1;resize:none;"></textarea></div>
+                <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLAIMS FNOL ─────────────────────────────────────── -->
+  <div class="component-group" id="mock-claims">
+    <div class="component-group-label">Mockup 3 — Claims · First Notice of Loss (FNOL)</div>
+    <div class="component-row">
+      <div>
+        <div class="frame-label">Claims FNOL — AI-guided intake chat</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="chat-panel" style="width:380px;">
+            <div class="chat-header">
+              <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+              <span class="chat-header-title">Report a Claim</span>
+              <span class="chat-header-badge" style="background:rgba(242,68,86,.15);color:var(--accent-red);border-color:rgba(242,68,86,.3);">FNOL</span>
+            </div>
+            <div style="background:#fef2f2;border-bottom:1px solid rgba(242,68,86,.2);padding:8px 14px;font-size:11.5px;color:#92160e;display:flex;align-items:center;gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              <span>Policy <strong>POL-MTR-2026-00441</strong> is active · Cover verified</span>
+            </div>
+            <div class="chat-thread" style="min-height:260px;">
+              <div class="time-divider">Today 14:32</div>
+              <div class="msg ai">
+                <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="bubble ai">I'm sorry to hear about your incident. I'll help you report it quickly. <strong>When did the incident occur?</strong></div>
+                  <div class="bubble-meta">14:32 · AZIC Claims</div>
+                </div>
+              </div>
+              <div class="msg user">
+                <div class="msg-avatar user">RK</div>
+                <div><div class="bubble user">This morning around 9 AM near Koramangala junction</div><div class="bubble-meta" style="text-align:right;">14:33</div></div>
+              </div>
+              <div class="msg ai">
+                <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="action-card conf-high" style="margin-bottom:6px;">
+                    <div class="action-card-header">
+                      <div class="action-card-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                      <span class="action-card-title">Incident Location Confirmed</span>
+                      <span class="conf-badge high">94%</span>
+                    </div>
+                    <div class="action-card-body">
+                      <div class="action-field"><div class="action-field-label">Mapped to</div><div class="action-field-value">Koramangala, Bengaluru · 25 Jun 2026, 09:00</div></div>
+                    </div>
+                    <div class="action-card-buttons">
+                      <button class="ac-btn accept">Confirm</button>
+                      <button class="ac-btn edit">Correct Location</button>
+                    </div>
+                  </div>
+                  <div class="bubble ai" style="margin-top:6px;"><strong>Was anyone injured?</strong> And do you have photos of the damage?</div>
+                  <div class="bubble-meta">14:33 · AZIC Claims</div>
+                  <div class="quick-replies">
+                    <span class="quick-chip">No injuries</span>
+                    <span class="quick-chip">Yes, injuries</span>
+                    <span class="quick-chip">Upload photos</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-bar">
+              <div class="chat-input-wrap">
+                <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <textarea rows="1" placeholder="Describe what happened…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12.5px;flex:1;resize:none;"></textarea>
+              </div>
+              <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="max-width:320px;">
+        <div class="frame-label">FNOL Progress Tracker</div>
+        <div class="frame-content" style="background:var(--surface-card);">
+          <div style="font-size:12px;font-weight:700;color:var(--surface-dark);margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            FNOL Progress — CLM-2026-00821
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--brand-green);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div style="width:2px;height:28px;background:var(--brand-green);"></div>
+              </div>
+              <div style="padding-bottom:20px;"><div style="font-size:12px;font-weight:600;color:var(--surface-dark);">Incident details captured</div><div style="font-size:11px;color:var(--secondary-grey);">Location, time, description</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--brand-green);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div style="width:2px;height:28px;background:var(--brand-dg-15);"></div>
+              </div>
+              <div style="padding-bottom:20px;"><div style="font-size:12px;font-weight:600;color:var(--surface-dark);">Policy cover verified</div><div style="font-size:11px;color:var(--secondary-grey);">POL-MTR-2026-00441 active</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--brand-dg-15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:8px;height:8px;border-radius:50%;background:var(--brand-dg-40);"></div></div>
+                <div style="width:2px;height:28px;background:var(--brand-dg-15);"></div>
+              </div>
+              <div style="padding-bottom:20px;"><div style="font-size:12px;font-weight:600;color:var(--brand-dg-40);">Evidence upload</div><div style="font-size:11px;color:var(--brand-dg-40);">Photos & documents pending</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--brand-dg-15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:8px;height:8px;border-radius:50%;background:var(--brand-dg-40);"></div></div>
+              </div>
+              <div><div style="font-size:12px;font-weight:600;color:var(--brand-dg-40);">Assessor assignment</div><div style="font-size:11px;color:var(--brand-dg-40);">Auto-assigned on submission</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POLICY RENEWAL ──────────────────────────────────── -->
+  <div class="component-group" id="mock-renewal">
+    <div class="component-group-label">Mockup 4 — Policy Renewal · AI-assisted review</div>
+    <div class="component-row">
+      <div>
+        <div class="frame-label">Renewal workspace (broker view)</div>
+        <div class="frame-content" style="padding:0;overflow:hidden;">
+          <div style="display:flex;height:480px;background:var(--brand-dg-5);">
+
+            <!-- Main renewal panel -->
+            <div style="flex:1;overflow-y:auto;padding:18px;border-right:1px solid var(--border-default);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <div>
+                  <div style="font-size:10px;color:var(--secondary-grey);text-transform:uppercase;letter-spacing:.6px;">Renewal</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--surface-dark);">POL-MTR-2024-00441</div>
+                  <div style="font-size:12px;color:var(--secondary-grey);">Expires 30 Jun 2026 · <span style="color:var(--accent-red);font-weight:600;">5 days</span></div>
+                </div>
+                <div style="background:#fef2f2;border:1px solid rgba(242,68,86,.25);border-radius:var(--r-sm);padding:8px 14px;text-align:center;">
+                  <div style="font-size:10px;color:var(--accent-red);font-weight:600;text-transform:uppercase;">Urgent</div>
+                  <div style="font-size:20px;font-weight:700;color:var(--accent-red);">5d</div>
+                </div>
+              </div>
+
+              <!-- AI change summary -->
+              <div style="background:var(--surface-card);border:1px solid var(--border-default);border-left:3px solid var(--brand-green);border-radius:var(--r-md);padding:14px;margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:700;color:var(--brand-green);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+                  AI Change Summary · What's different this renewal
+                </div>
+                <div style="display:flex;flex-direction:column;gap:7px;">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-orange);flex-shrink:0;"></span>
+                    <span style="color:var(--secondary-grey);">IDV</span>
+                    <span style="font-weight:600;color:var(--surface-dark);">₹9.8L → ₹10.4L</span>
+                    <span style="font-size:10px;background:#fff4e5;color:#92400e;padding:1px 6px;border-radius:var(--r-pill);">+6.1%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-red);flex-shrink:0;"></span>
+                    <span style="color:var(--secondary-grey);">Claims last year</span>
+                    <span style="font-weight:600;color:var(--surface-dark);">1 claim (₹42,000)</span>
+                    <span style="font-size:10px;background:#fef2f2;color:var(--accent-red);padding:1px 6px;border-radius:var(--r-pill);">NCB loss</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--brand-green);flex-shrink:0;"></span>
+                    <span style="color:var(--secondary-grey);">Estimated premium</span>
+                    <span style="font-weight:600;color:var(--surface-dark);">₹18,240</span>
+                    <span style="font-size:10px;background:var(--brand-lg-25);color:var(--surface-dark);padding:1px 6px;border-radius:var(--r-pill);">AI calculated</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action bar -->
+              <div style="display:flex;gap:8px;">
+                <button style="flex:1;padding:10px;background:var(--brand-green);border:none;border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;color:#000;cursor:pointer;">Accept & Renew</button>
+                <button style="padding:10px 16px;background:transparent;border:1.5px solid var(--surface-dark);border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--surface-dark);cursor:pointer;">Modify Terms</button>
+                <button style="padding:10px 14px;background:transparent;border:1.5px solid var(--accent-red);border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;color:var(--accent-red);cursor:pointer;">Non-renew</button>
+              </div>
+            </div>
+
+            <!-- AI chat -->
+            <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface-card);">
+              <div class="chat-header">
+                <div class="chat-header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <span class="chat-header-title">AI Assist</span>
+                <span class="chat-header-badge">Renewal</span>
+              </div>
+              <div class="chat-thread" style="flex:1;max-height:none;">
+                <div class="msg ai">
+                  <div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                  <div>
+                    <div class="bubble ai">This renewal has <strong>1 claim last year</strong> — NCB drops from 25% to 0%. Recommend reviewing premium increase with customer before binding.</div>
+                    <div class="bubble-meta">09:10 · AI</div>
+                    <div class="quick-replies">
+                      <span class="quick-chip">Draft renewal letter</span>
+                      <span class="quick-chip">Compare last year</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <div class="chat-input-wrap"><textarea rows="1" placeholder="Ask about renewal…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12px;flex:1;resize:none;"></textarea></div>
+                <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CUSTOMER PORTAL ─────────────────────────────────── -->
+  <div class="component-group" id="mock-customer">
+    <div class="component-group-label">Mockup 5 — Customer Portal · Self-service AI Chat</div>
+    <div class="component-row">
+      <div>
+        <div class="frame-label">Customer-facing chat (plain language, no jargon)</div>
+        <div class="frame-content" style="padding:0;">
+          <div class="chat-panel" style="width:380px;">
+            <div class="chat-header" style="background:var(--brand-green);">
+              <div class="chat-header-icon" style="background:var(--surface-dark);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg>
+              </div>
+              <span class="chat-header-title" style="color:var(--surface-dark);">Azentio Support</span>
+              <span class="chat-header-badge" style="background:rgba(22,48,61,.15);color:var(--surface-dark);border-color:rgba(22,48,61,.2);">Customer</span>
+              <div class="chat-header-btn" style="color:rgba(22,48,61,.6);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+            </div>
+            <div class="chat-thread" style="min-height:300px;">
+              <div class="time-divider">Today 16:05</div>
+              <div class="msg ai">
+                <div class="msg-avatar ai" style="background:var(--surface-dark);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="bubble ai">Hi Priya! 👋 How can I help you with your car insurance today?</div>
+                  <div class="bubble-meta">16:05</div>
+                  <div class="quick-replies">
+                    <span class="quick-chip">Download policy</span>
+                    <span class="quick-chip">What's covered?</span>
+                    <span class="quick-chip">Report a claim</span>
+                    <span class="quick-chip">Renew policy</span>
+                  </div>
+                </div>
+              </div>
+              <div class="msg user">
+                <div class="msg-avatar user" style="background:var(--brand-green);color:#000;font-size:11px;">PM</div>
+                <div><div class="bubble user">Does my policy cover flood damage?</div><div class="bubble-meta" style="text-align:right;">16:06</div></div>
+              </div>
+              <div class="msg ai">
+                <div class="msg-avatar ai" style="background:var(--surface-dark);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div>
+                <div>
+                  <div class="bubble ai"><strong>Yes, your policy covers flood damage</strong> — it's included under "Natural Calamities" in your Comprehensive plan. <br><br>This covers: water damage from flooding, cyclones, and storms. It does <strong>not</strong> cover pre-existing waterlogging damage.</div>
+                  <div class="bubble-meta">16:06</div>
+                  <div class="quick-replies">
+                    <span class="quick-chip">How to claim?</span>
+                    <span class="quick-chip">View full policy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 12px;border-top:1px solid var(--border-default);background:#f8fffe;font-size:11px;color:var(--brand-dg-40);display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Answers based on your active policy POL-MTR-2026-00441
+            </div>
+            <div class="chat-input-bar">
+              <div class="chat-input-wrap">
+                <textarea rows="1" placeholder="Type your question…" style="font-family:'Poppins',sans-serif;border:none;outline:none;background:transparent;font-size:12.5px;flex:1;resize:none;"></textarea>
+                <svg class="chat-input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+              </div>
+              <button class="chat-send-btn disabled"><svg viewBox="0 0 24 24" fill="none" stroke="#8a979e" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="max-width:300px;">
+        <div class="frame-label">Customer portal — policy card</div>
+        <div class="frame-content" style="padding:0;overflow:hidden;">
+          <div style="background:var(--surface-dark);padding:16px;">
+            <div style="font-size:10px;color:#4a6a7a;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">My Policy</div>
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">Comprehensive Motor</div>
+            <div style="background:rgba(255,255,255,.05);border-radius:var(--r-md);padding:12px;margin-bottom:12px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <div><div style="font-size:10px;color:#4a6a7a;">Vehicle</div><div style="font-size:12px;font-weight:600;color:#fff;">Maruti Brezza 2022</div></div>
+                <div style="text-align:right;"><div style="font-size:10px;color:#4a6a7a;">Policy No.</div><div style="font-size:12px;font-weight:600;color:#fff;">POL-MTR-2026-00441</div></div>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:8px;"></div>
+              <div style="display:flex;justify-content:space-between;">
+                <div><div style="font-size:10px;color:#4a6a7a;">Expires</div><div style="font-size:12px;font-weight:600;color:var(--accent-red);">30 Jun 2026</div></div>
+                <div style="text-align:right;"><div style="font-size:10px;color:#4a6a7a;">IDV</div><div style="font-size:12px;font-weight:600;color:#fff;">₹10,40,000</div></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button style="flex:1;padding:9px;background:var(--brand-green);border:none;border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:#000;cursor:pointer;">Renew Now</button>
+              <button style="padding:9px 14px;background:transparent;border:1px solid rgba(255,255,255,.2);border-radius:var(--r-sm);font-family:'Poppins',sans-serif;font-size:12px;color:#fff;cursor:pointer;">Download</button>
+            </div>
+          </div>
+          <div style="padding:12px 16px;background:var(--surface-card);">
+            <div style="font-size:11px;font-weight:700;color:var(--surface-dark);margin-bottom:8px;">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r-xs);cursor:pointer;transition:background .15s;" onmouseover="this.style.background='var(--brand-dg-5)'" onmouseout="this.style.background='transparent'">
+                <div style="width:28px;height:28px;border-radius:6px;background:var(--brand-lg-25);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand-green)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
+                <span style="font-size:12px;font-weight:500;color:var(--surface-dark);">Report a Claim</span>
+                <svg width="12" height="12" style="margin-left:auto;color:var(--brand-dg-40);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r-xs);cursor:pointer;" onmouseover="this.style.background='var(--brand-dg-5)'" onmouseout="this.style.background='transparent'">
+                <div style="width:28px;height:28px;border-radius:6px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div>
+                <span style="font-size:12px;font-weight:500;color:var(--surface-dark);">Download Documents</span>
+                <svg width="12" height="12" style="margin-left:auto;color:var(--brand-dg-40);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r-xs);cursor:pointer;" onmouseover="this.style.background='var(--brand-dg-5)'" onmouseout="this.style.background='transparent'">
+                <div style="width:28px;height:28px;border-radius:6px;background:#faf5ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-purple)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <span style="font-size:12px;font-weight:500;color:var(--surface-dark);">Chat with AI Support</span>
+                <svg width="12" height="12" style="margin-left:auto;color:var(--brand-dg-40);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:48px;"></div>
+</main>
+
+<script>
+// Nav scroll spy
+const groups = document.querySelectorAll('.component-group[id]');
+const navLinks = document.querySelectorAll('.left-nav .nav-item');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const match = document.querySelector('.left-nav a[href="#' + e.target.id + '"]');
+      if (match) match.classList.add('active');
+    }
+  });
+}, { rootMargin:'-20% 0px -60% 0px' });
+groups.forEach(g => obs.observe(g));
+
+// Smooth scroll
+navLinks.forEach(l => l.addEventListener('click', e => {
+  e.preventDefault();
+  const t = document.querySelector(l.getAttribute('href'));
+  if (t) t.scrollIntoView({ behavior:'smooth', block:'start' });
+}));
+
+// Chip selection
+function selectChip(el) {
+  const siblings = el.closest('.quick-replies').querySelectorAll('.quick-chip');
+  siblings.forEach(c => { c.classList.add('selected'); c.style.opacity = '.4'; c.style.cursor = 'default'; });
+  el.style.opacity = '1';
+  el.classList.add('selected');
+}
+
+// Accept card
+function acceptCard(btn) {
+  const card = btn.closest('.action-card');
+  card.classList.remove('conf-med','conf-high','conf-low');
+  card.classList.add('accepted');
+  card.querySelector('.action-card-title').style.color = 'var(--accent-green)';
+  card.querySelector('.action-card-title').textContent = '✓ Acknowledged — Vessel Age Flag';
+  const header = card.querySelector('.action-card-icon');
+  header.style.background = '#dcfce7';
+  header.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+  card.querySelector('.conf-badge').className = 'conf-badge na';
+  card.querySelector('.conf-badge').style.cssText = 'background:#dcfce7;color:var(--accent-green);';
+  card.querySelector('.conf-badge').textContent = '09:43';
+  card.querySelector('.action-card-buttons').innerHTML = '<button class="ac-btn accepted-state">✓ Acknowledged</button><button class="ac-btn dismiss" style="font-size:11px;">Undo (9s)</button>';
+}
+
+// Send message
+function toggleSend(ta) {
+  const btn = document.getElementById('sendBtn');
+  const icon = document.getElementById('sendIcon');
+  if (ta.value.trim()) {
+    btn.classList.remove('disabled');
+    icon.setAttribute('stroke','#000');
+  } else {
+    btn.classList.add('disabled');
+    icon.setAttribute('stroke','#8a979e');
+  }
+}
+function sendMsg() {
+  const ta = document.getElementById('mainInput');
+  const msg = ta.value.trim();
+  if (!msg) return;
+  const thread = ta.closest('.chat-panel').querySelector('.chat-thread');
+  const bubble = document.createElement('div');
+  bubble.className = 'msg user';
+  bubble.innerHTML = `<div class="msg-avatar user">PD</div><div><div class="bubble user">${msg}</div><div class="bubble-meta" style="text-align:right;">Now</div></div>`;
+  thread.appendChild(bubble);
+  ta.value = '';
+  toggleSend(ta);
+  thread.scrollTop = thread.scrollHeight;
+  setTimeout(() => {
+    const typing = document.createElement('div');
+    typing.className = 'msg ai';
+    typing.innerHTML = `<div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+    thread.appendChild(typing);
+    thread.scrollTop = thread.scrollHeight;
+    setTimeout(() => {
+      typing.remove();
+      const reply = document.createElement('div');
+      reply.className = 'msg ai';
+      reply.innerHTML = `<div class="msg-avatar ai"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 2L15 9H22L16.5 13.5L18.5 21L12 17L5.5 21L7.5 13.5L2 9H9L12 2Z"/></svg></div><div><div class="bubble ai">I've noted that. Would you like me to generate a request letter for the Extended Survey Certificate?</div><div class="bubble-meta">Now · AZIC Assist</div><div class="quick-replies"><span class="quick-chip" onclick="selectChip(this)">Yes, draft it</span><span class="quick-chip" onclick="selectChip(this)">No thanks</span></div></div>`;
+      thread.appendChild(reply);
+      thread.scrollTop = thread.scrollHeight;
+    }, 1800);
+  }, 400);
+}
+</script>
+</body>
+</html>
